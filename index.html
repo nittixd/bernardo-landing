@@ -1,16 +1,179 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>Próximamente</title>
-<style>
-  html,body{height:100%;margin:0}
-  body{display:grid;place-items:center;background:#fff;color:#17121f;font:500 15px/1.4 system-ui,-apple-system,sans-serif}
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bernardo Vásquez · Estructuración y administración patrimonial</title>
+<meta name="description" content="Consulta de una hora para analizar tu situación patrimonial, identificar qué necesitás ordenar y evaluar si un fideicomiso tiene sentido para vos.">
+<link rel="canonical" href="https://bernardovasquez.com.ar/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta property="og:url" content="https://bernardovasquez.com.ar/">
+<meta property="og:title" content="Bernardo Vásquez · Estructuración y administración patrimonial">
+<meta property="og:description" content="Revisemos cómo está organizado tu patrimonio. Consulta de una hora con Bernardo Vásquez, abogado especializado en fideicomisos.">
+<meta property="og:image" content="https://bernardovasquez.com.ar/assets/img/bernardo.jpg">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/intertight-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/satoshi-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css?v=1">
+<script>document.documentElement.classList.add('js')</script>
+<!--
+THESIS: la consulta paga como única puerta; el formulario de preguntas vive en el primer viewport, como en la referencia (Arcadia), sin el andamiaje de "clase en vivo".
+OWN-WORLD: blanco y tinta casi negra, un solo azul marino (el del traje) para la acción. Inter Tight 700 en titulares con tracking cerrado, Satoshi en todo lo demás. La única caja de la página es la tarjeta de preguntas; el resto son bloques de texto y una foto.
+STORY: entiendo qué ofrece y cuánto cuesta, respondo tres preguntas, dejo mis datos, pago con Mercado Pago y elijo horario.
+FIRST VIEWPORT: barra con avatar y nombre; titular centrado de dos líneas; bajada; tarjeta de preguntas de 560px con la primera pregunta; debajo, duración, valor y descuento en una línea.
+FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin contador, sin pastilla de "en vivo", sin rótulos en mayúscula espaciada ni ficha de "presentador".
+-->
 </head>
 <body>
-<p>Sitio en construcción.</p>
+<a class="skip" href="#reservar">Ir al formulario de reserva</a>
+
+<header class="top" data-top>
+  <div class="wrap top__in">
+    <a class="brand" href="/" aria-label="Bernardo Vásquez, inicio">
+      <img class="brand__img" src="/assets/img/avatar.jpg" alt="" width="36" height="36">
+      <span class="brand__name">Bernardo Vásquez</span>
+    </a>
+    <a class="top__cta" href="#reservar" data-cta="header">Reservar consulta</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="reservar" aria-labelledby="hero-title">
+    <div class="wrap hero__in">
+      <h1 class="hero__title" id="hero-title">Revisemos cómo está organizado tu patrimonio</h1>
+      <p class="hero__lead">Una consulta para analizar tu situación patrimonial, identificar qué necesitás ordenar y evaluar si un fideicomiso tiene sentido para vos.</p>
+
+      <form class="quiz" id="quiz" action="/api/checkout" method="post" novalidate>
+        <div class="quiz__head">
+          <p class="quiz__intro">Antes de reservar, tres preguntas para conocerte un poco.</p>
+          <div class="quiz__bar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        </div>
+
+        <div class="quiz__live" aria-live="polite" data-live></div>
+
+        <fieldset class="step" data-step="1">
+          <legend class="step__q" tabindex="-1"><span class="step__n">1.</span> ¿A qué te dedicás?</legend>
+          <p class="step__help" id="h1">Tu profesión o actividad principal.</p>
+          <input class="field" type="text" name="dedicacion" id="f-dedicacion" autocomplete="organization-title" maxlength="140" aria-describedby="h1" placeholder="Ej.: médico, comerciante" required>
+          <p class="step__err" data-err="dedicacion"></p>
+          <button class="btn btn--primary" type="button" data-next>Continuar <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></button>
+        </fieldset>
+
+        <fieldset class="step" data-step="2">
+          <legend class="step__q" tabindex="-1"><span class="step__n">2.</span> ¿Sobre qué te gustaría conversar en la consulta?</legend>
+          <p class="step__help" id="h2">Con una o dos líneas alcanza. Durante la reunión vamos a tener tiempo para conocer tu historia y profundizar en tu situación.</p>
+          <textarea class="field field--area" name="tema" id="f-tema" rows="3" maxlength="600" aria-describedby="h2" required></textarea>
+          <p class="step__err" data-err="tema"></p>
+          <div class="step__nav">
+            <button class="btn btn--ghost" type="button" data-back>Volver</button>
+            <button class="btn btn--primary" type="button" data-next>Continuar <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></button>
+          </div>
+        </fieldset>
+
+        <fieldset class="step" data-step="3">
+          <legend class="step__q" tabindex="-1"><span class="step__n">3.</span> ¿Las decisiones sobre tu patrimonio las tomás vos o las compartís con alguien más?</legend>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="decisiones" value="Las tomo yo" required><span>Las tomo yo.</span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></label>
+            <label class="opt"><input type="radio" name="decisiones" value="Las comparto con mi pareja, familiares o socios"><span>Las comparto con mi pareja, familiares o socios.</span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></label>
+            <label class="opt"><input type="radio" name="decisiones" value="Estoy consultando para otra persona"><span>Estoy consultando para otra persona.</span><svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></label>
+          </div>
+          <p class="step__err" data-err="decisiones"></p>
+          <div class="step__nav step__nav--solo">
+            <button class="btn btn--ghost" type="button" data-back>Volver</button>
+          </div>
+        </fieldset>
+
+        <fieldset class="step" data-step="4">
+          <legend class="step__q" tabindex="-1">¿A nombre de quién reservamos?</legend>
+          <p class="step__help">Con estos datos te confirmamos la consulta.</p>
+          <label class="lbl" for="f-nombre">Nombre y apellido</label>
+          <input class="field" type="text" name="nombre" id="f-nombre" autocomplete="name" maxlength="100" required>
+          <p class="step__err" data-err="nombre"></p>
+          <label class="lbl" for="f-email">Email</label>
+          <input class="field" type="email" name="email" id="f-email" autocomplete="email" inputmode="email" maxlength="120" required>
+          <p class="step__err" data-err="email"></p>
+          <label class="lbl" for="f-whatsapp">WhatsApp</label>
+          <input class="field" type="tel" name="whatsapp" id="f-whatsapp" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="221 555 1234" required>
+          <p class="step__err" data-err="whatsapp"></p>
+
+          <div class="pay">
+            <p class="pay__row"><span>Consulta de 1 hora</span><strong>USD 200</strong></p>
+            <p class="pay__note" data-precio>Se paga en pesos con Mercado Pago, al tipo de cambio del día.</p>
+          </div>
+          <p class="step__err step__err--form" data-err="form"></p>
+          <button class="btn btn--primary btn--pay" type="submit" data-submit>
+            <span data-label>Ir al pago</span> <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg>
+          </button>
+          <div class="step__nav step__nav--solo">
+            <button class="btn btn--ghost" type="button" data-back>Volver</button>
+          </div>
+        </fieldset>
+      </form>
+
+      <p class="facts">
+        <span>Consulta de 1 hora</span><span>USD 200</span><span>Se descuenta de los honorarios si avanzamos</span>
+      </p>
+    </div>
+  </section>
+
+  <section class="what" aria-labelledby="what-title">
+    <div class="wrap">
+      <h2 class="h2 center" id="what-title">Estructuración y administración patrimonial</h2>
+      <p class="what__lead">Ayudo a empresarios y profesionales a organizar su patrimonio, definir cómo administrarlo y planificar qué va a pasar con esos bienes en el futuro.</p>
+      <div class="what__cols">
+        <p>Trabajo principalmente con fideicomisos de administración patrimonial. Según lo que necesite cada caso, también incorporo sociedades u otras herramientas jurídicas.</p>
+        <p>Primero conversamos sobre tu situación: cómo están organizados tus bienes, qué relación tienen con tu actividad y qué querés resolver. A partir de ahí, diseñamos e implementamos la estructura que tenga sentido para vos.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" aria-labelledby="about-title">
+    <div class="wrap about__in">
+      <figure class="about__photo">
+        <img src="/assets/img/bernardo.jpg" alt="Bernardo Vásquez" width="967" height="1109" loading="lazy" decoding="async">
+      </figure>
+      <div class="about__text">
+        <h2 class="h2" id="about-title">Sobre mí</h2>
+        <p>Soy Bernardo Vásquez, abogado egresado de la Universidad Nacional de La Plata, especializado en estructuras patrimoniales, con foco principal en fideicomisos.</p>
+        <p>Complementé mi formación con estudios en Planificación Patrimonial y Corporate Lawyer en la UCEMA. He participado en congresos de fideicomisos y presentado ponencias sobre la materia.</p>
+        <a class="btn btn--primary btn--inline" href="#reservar" data-cta="sobre-mi">Reservar una consulta <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pod" aria-labelledby="pod-title">
+    <div class="wrap pod__in">
+      <h2 class="pod__title" id="pod-title">Antes que se lave</h2>
+      <p class="pod__text">En mi podcast comparto ideas, experiencias y conversaciones sobre patrimonio, negocios, productividad y tecnología. Acá podés encontrar los recursos descargables que acompañan los episodios.</p>
+      <a class="btn btn--light btn--inline" href="#" data-recursos target="_blank" rel="noopener">Explorar los recursos</a>
+    </div>
+  </section>
+
+  <section class="close" aria-labelledby="close-title">
+    <div class="wrap close__in">
+      <h2 class="h2 center" id="close-title">Reservá tu consulta</h2>
+      <p class="close__text">Una hora para analizar tu situación patrimonial, identificar qué necesitás ordenar y evaluar si un fideicomiso tiene sentido para vos.</p>
+      <dl class="close__facts">
+        <div><dt>Duración</dt><dd>1 hora</dd></div>
+        <div><dt>Valor</dt><dd>USD 200</dd></div>
+      </dl>
+      <p class="close__note">Si luego avanzamos con la estructuración del fideicomiso, el importe se descuenta íntegramente de los honorarios.</p>
+      <a class="btn btn--primary btn--inline" href="#reservar" data-cta="cierre">Reservar una consulta <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <span>© 2026 Bernardo Vásquez</span>
+    <span>Abogado · Fideicomisos de administración patrimonial</span>
+  </div>
+</footer>
+
+<script src="/js/config.js?v=1"></script>
+<script src="/js/main.js?v=1"></script>
 </body>
 </html>

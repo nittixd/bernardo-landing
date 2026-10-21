@@ -1,7 +1,8 @@
-/* Servidor estático mínimo de la landing de Bernardo.
-   Local: node serve.js (puerto 4194).
-   VPS: corre bajo pm2 con el PORT que se le asigne y Caddy le hace reverse proxy.
-   Sirve video con soporte de Range (206): sin eso, Safari no reproduce. */
+/* Servidor local de la landing de Bernardo (no se publica: está en .vercelignore).
+   node serve.js → http://localhost:4194
+   Imita a Vercel: URLs sin .html (/gracias) y las funciones de /api con req.body ya parseado.
+   Para que /api/checkout funcione, MP_ACCESS_TOKEN tiene que estar en el entorno
+   (el perfil bernardo-landing del launch.json lo carga de ~/.config/bernardo-landing/mercadopago.env). */
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -21,46 +22,49 @@ const MIME = {
   '.ico': 'image/x-icon',
   '.json': 'application/json; charset=utf-8',
   '.mp4': 'video/mp4',
-  '.webm': 'video/webm',
 };
+
+function api(req, res, name) {
+  const file = path.join(ROOT, 'api', name + '.js');
+  if (name.startsWith('_') || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+  let raw = '';
+  req.on('data', (c) => { raw += c; });
+  req.on('end', async () => {
+    const type = String(req.headers['content-type'] || '');
+    if (/json/.test(type)) { try { req.body = JSON.parse(raw || '{}'); } catch (e) { req.body = {}; } }
+    else if (/urlencoded/.test(type)) req.body = Object.fromEntries(new URLSearchParams(raw));
+    else req.body = raw;
+    res.status = (c) => { res.statusCode = c; return res; };
+    res.json = (o) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(o)); return res; };
+    try {
+      delete require.cache[require.resolve(file)];
+      delete require.cache[require.resolve(path.join(ROOT, 'api', '_mp.js'))];
+      await require(file)(req, res);
+    } catch (e) {
+      console.error(e);
+      if (!res.headersSent) { res.statusCode = 500; res.end('error'); }
+    }
+  });
+}
 
 http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
+  const m = /^\/api\/([\w-]+)\/?$/.exec(urlPath);
+  if (m) return api(req, res, m[1]);
   if (urlPath === '/') urlPath = '/index.html';
-  const file = path.join(ROOT, urlPath);
+  let file = path.join(ROOT, urlPath);
   if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }
+  if (!path.extname(file) && fs.existsSync(file + '.html')) file += '.html';
   fs.stat(file, (err, st) => {
     if (err || !st.isFile()) {
       res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
       return res.end('<h1>404</h1>');
     }
     const ext = path.extname(file);
-    const type = MIME[ext] || 'application/octet-stream';
-    const cache = (ext === '.html') ? 'no-cache' : 'public, max-age=604800';
-    const range = req.headers.range;
-    if (range) {
-      const m = /bytes=(\d*)-(\d*)/.exec(range);
-      let start = m && m[1] ? parseInt(m[1], 10) : 0;
-      let end = m && m[2] ? parseInt(m[2], 10) : st.size - 1;
-      if (isNaN(start) || start >= st.size) {
-        res.writeHead(416, { 'Content-Range': 'bytes */' + st.size });
-        return res.end();
-      }
-      if (isNaN(end) || end >= st.size) end = st.size - 1;
-      res.writeHead(206, {
-        'Content-Type': type,
-        'Cache-Control': cache,
-        'Content-Range': 'bytes ' + start + '-' + end + '/' + st.size,
-        'Content-Length': end - start + 1,
-        'Accept-Ranges': 'bytes',
-      });
-      return fs.createReadStream(file, { start, end }).pipe(res);
-    }
     res.writeHead(200, {
-      'Content-Type': type,
-      'Cache-Control': cache,
+      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Cache-Control': 'no-cache',
       'Content-Length': st.size,
-      'Accept-Ranges': 'bytes',
     });
     fs.createReadStream(file).pipe(res);
   });
