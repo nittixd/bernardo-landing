@@ -44,11 +44,10 @@
 
   --wrap: 1120px;
   --gutter: 24px;
-  --top-h: 68px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--top-h) + 12px); }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 16px; }
 body {
   margin: 0;
   background: var(--bg);
@@ -77,34 +76,16 @@ button, input, textarea { font: inherit; color: inherit; }
 
 :focus-visible { outline: 2px solid var(--navy); outline-offset: 3px; border-radius: 6px; }
 
-/* ---------- barra ---------- */
-.top {
-  position: sticky; top: 0; z-index: 20;
-  background: rgba(250, 250, 251, .86);
-  -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--t-ui) ease;
-}
-.top.is-scrolled { border-bottom-color: var(--line); }
-.top__in { height: var(--top-h); display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-.brand__img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
-.brand__name { font: 700 18px/1 var(--head); letter-spacing: -0.02em; }
-.top__cta {
-  font: 500 15px/1 var(--body);
+/* ---------- nombre arriba ---------- */
+.name { padding: clamp(26px, 4vw, 40px) var(--gutter) 0; text-align: center; }
+.name__link {
+  font: 700 clamp(19px, 1.8vw, 22px)/1 var(--head);
+  letter-spacing: -0.02em;
   text-decoration: none;
-  color: var(--navy);
-  padding: 11px 16px;
-  border-radius: 999px;
-  border: 1px solid var(--line-2);
-  background: var(--surface);
-  transition: border-color var(--t-ui) ease, transform var(--t-press) var(--ease-out);
 }
-.top__cta:active { transform: scale(.97); }
 
 /* ---------- hero ---------- */
-.hero { padding: clamp(40px, 7vw, 76px) 0 clamp(56px, 8vw, 96px); }
+.hero { padding: clamp(36px, 6vw, 64px) 0 clamp(56px, 8vw, 96px); }
 .hero__in { display: flex; flex-direction: column; align-items: center; text-align: center; }
 .hero__title {
   margin: 0;
@@ -232,7 +213,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .btn--light { min-height: 56px; padding: 0 26px; background: #fff; color: var(--navy-deep); margin-top: 28px; }
 
 @media (hover: hover) and (pointer: fine) {
-  .top__cta:hover { border-color: var(--navy); }
   .opt:hover { border-color: var(--navy); }
   .opt:hover svg, .btn:hover svg { transform: translateX(3px); }
   .btn--primary:hover { background: var(--navy-hover); }
@@ -242,10 +222,10 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 
 .facts {
   margin-top: 22px;
-  display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 0;
-  font-size: 15px; color: var(--muted);
+  max-width: 34em;
+  font-size: 15px; line-height: 1.5; color: var(--muted);
+  text-wrap: balance;
 }
-.facts span + span::before { content: "·"; margin: 0 10px; color: #b5bac5; }
 
 /* ---------- con JS: una pregunta por vez ---------- */
 .js .quiz__bar { display: grid; }
@@ -256,7 +236,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 @keyframes step-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @keyframes step-out { from { opacity: 1; } to { opacity: 0; transform: translateY(-4px); } }
 
-.hero__title, .hero__lead, .quiz, .facts { animation: rise 620ms var(--ease-out) both; }
+.name, .hero__title, .hero__lead, .quiz, .facts { animation: rise 620ms var(--ease-out) both; }
 .hero__lead { animation-delay: 60ms; }
 .quiz { animation-delay: 120ms; }
 .facts { animation-delay: 180ms; }
@@ -297,15 +277,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .pod__title { margin: 0; font: 700 clamp(40px, 6vw, 72px)/1 var(--head); letter-spacing: -0.04em; }
 .pod__text { margin-top: 22px; max-width: 34em; font-size: clamp(17px, 1.7vw, 19px); line-height: 1.6; color: rgba(255, 255, 255, .74); text-wrap: pretty; }
 
-.close { padding: clamp(80px, 11vw, 136px) 0; background: var(--surface); }
-.close__in { display: flex; flex-direction: column; align-items: center; text-align: center; }
-.close__text { margin-top: 20px; max-width: 32em; font-size: clamp(17px, 1.7vw, 19px); color: var(--muted); text-wrap: pretty; }
-.close__facts { display: flex; gap: clamp(40px, 8vw, 96px); margin: 36px 0 0; }
-.close__facts dt { font-size: 14px; color: var(--muted); }
-.close__facts dd { margin: 4px 0 0; font: 700 clamp(28px, 3.4vw, 40px)/1.1 var(--head); letter-spacing: -0.03em; }
-.close__note { margin-top: 28px; max-width: 30em; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty; }
-.close .btn { margin-top: 32px; }
-
 .foot { border-top: 1px solid var(--line); padding: 28px 0 calc(28px + env(safe-area-inset-bottom)); font-size: 14px; color: var(--muted); }
 .foot__in { display: flex; justify-content: space-between; gap: 8px 24px; flex-wrap: wrap; }
 
@@ -321,30 +292,21 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
-  :root { --gutter: 16px; --top-h: 60px; }
-  .brand__name { font-size: 17px; }
-  .brand__img { width: 32px; height: 32px; }
-  .top__cta { padding: 10px 14px; font-size: 14px; }
+  :root { --gutter: 16px; }
   .hero__title { font-size: clamp(36px, 10.4vw, 44px); letter-spacing: -0.03em; }
-  .facts span:last-child { flex-basis: 100%; }
-  .facts span:last-child::before { content: none; }
   .quiz { padding: 22px 18px 24px; border-radius: 20px; }
-  .facts { font-size: 14px; }
   .what__cols { grid-template-columns: 1fr; gap: 28px; }
   .about__in { grid-template-columns: 1fr; }
   .about__photo { max-width: 460px; }
-  .about__text .btn, .close .btn, .pod .btn { width: 100%; min-width: 0; }
+  .about__text .btn, .pod .btn { width: 100%; min-width: 0; }
   .foot__in { flex-direction: column; }
 }
-@media (max-width: 380px) {
-  .brand__name { font-size: 16px; }
-  .top__cta { padding: 9px 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero__title, .hero__lead, .quiz, .facts { animation: none; }
+  .name, .hero__title, .hero__lead, .quiz, .facts { animation: none; }
   .js .step.is-active { animation: fade 160ms ease both; }
   .js .step.is-leaving { animation: none; display: none; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  .btn:active, .opt:active, .top__cta:active { transform: none; }
+  .btn:active, .opt:active { transform: none; }
 }

@@ -17,27 +17,21 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/intertight-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/satoshi-500.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=1">
+<link rel="stylesheet" href="/css/styles.css?v=2">
 <script>document.documentElement.classList.add('js')</script>
 <!--
 THESIS: la consulta paga como única puerta; el formulario de preguntas vive en el primer viewport, como en la referencia (Arcadia), sin el andamiaje de "clase en vivo".
 OWN-WORLD: blanco y tinta casi negra, un solo azul marino (el del traje) para la acción. Inter Tight 700 en titulares con tracking cerrado, Satoshi en todo lo demás. La única caja de la página es la tarjeta de preguntas; el resto son bloques de texto y una foto.
 STORY: entiendo qué ofrece y cuánto cuesta, respondo tres preguntas, dejo mis datos, pago con Mercado Pago y elijo horario.
-FIRST VIEWPORT: barra con avatar y nombre; titular centrado de dos líneas; bajada; tarjeta de preguntas de 560px con la primera pregunta; debajo, duración, valor y descuento en una línea.
+FIRST VIEWPORT: el nombre centrado arriba, sin barra ni foto; titular centrado de dos líneas; bajada; tarjeta de preguntas de 560px con la primera pregunta; debajo, una línea con el descuento de la consulta.
 FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin contador, sin pastilla de "en vivo", sin rótulos en mayúscula espaciada ni ficha de "presentador".
 -->
 </head>
 <body>
 <a class="skip" href="#reservar">Ir al formulario de reserva</a>
 
-<header class="top" data-top>
-  <div class="wrap top__in">
-    <a class="brand" href="/" aria-label="Bernardo Vásquez, inicio">
-      <img class="brand__img" src="/assets/img/avatar.jpg" alt="" width="36" height="36">
-      <span class="brand__name">Bernardo Vásquez</span>
-    </a>
-    <a class="top__cta" href="#reservar" data-cta="header">Reservar consulta</a>
-  </div>
+<header class="name">
+  <a class="name__link" href="/">Bernardo Vásquez</a>
 </header>
 
 <main>
@@ -100,7 +94,7 @@ FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin con
           <p class="step__err" data-err="whatsapp"></p>
 
           <div class="pay">
-            <p class="pay__row"><span>Consulta de 1 hora</span><strong>USD 200</strong></p>
+            <p class="pay__row"><span>Valor de la consulta</span><strong>USD 200</strong></p>
             <p class="pay__note" data-precio>Se paga en pesos con Mercado Pago, al tipo de cambio del día.</p>
           </div>
           <p class="step__err step__err--form" data-err="form"></p>
@@ -113,9 +107,7 @@ FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin con
         </fieldset>
       </form>
 
-      <p class="facts">
-        <span>Consulta de 1 hora</span><span>USD 200</span><span>Se descuenta de los honorarios si avanzamos</span>
-      </p>
+      <p class="facts">Si avanzamos con la estructuración, el valor de la consulta se descuenta de los honorarios.</p>
     </div>
   </section>
 
@@ -152,18 +144,6 @@ FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin con
     </div>
   </section>
 
-  <section class="close" aria-labelledby="close-title">
-    <div class="wrap close__in">
-      <h2 class="h2 center" id="close-title">Reservá tu consulta</h2>
-      <p class="close__text">Una hora para analizar tu situación patrimonial, identificar qué necesitás ordenar y evaluar si un fideicomiso tiene sentido para vos.</p>
-      <dl class="close__facts">
-        <div><dt>Duración</dt><dd>1 hora</dd></div>
-        <div><dt>Valor</dt><dd>USD 200</dd></div>
-      </dl>
-      <p class="close__note">Si luego avanzamos con la estructuración del fideicomiso, el importe se descuenta íntegramente de los honorarios.</p>
-      <a class="btn btn--primary btn--inline" href="#reservar" data-cta="cierre">Reservar una consulta <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></a>
-    </div>
-  </section>
 </main>
 
 <footer class="foot">
@@ -174,6 +154,6 @@ FORM: referencia del cliente (arcadiamedia.io/masterclass-r) readaptada; sin con
 </footer>
 
 <script src="/js/config.js?v=1"></script>
-<script src="/js/main.js?v=1"></script>
+<script src="/js/main.js?v=2"></script>
 </body>
 </html>

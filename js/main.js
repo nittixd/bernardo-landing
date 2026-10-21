@@ -8,14 +8,6 @@
   function load() { try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save(d) { try { sessionStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
 
-  /* barra: filete al bajar */
-  var top = document.querySelector('[data-top]');
-  if (top) {
-    var onScroll = function () { top.classList.toggle('is-scrolled', window.scrollY > 8); };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-  }
-
   /* recursos del podcast */
   var rec = document.querySelector('[data-recursos]');
   if (rec) {
@@ -227,7 +219,7 @@
     var a = e.target.closest('a[data-cta]');
     if (!a) return;
     e.preventDefault();
-    var y = form.getBoundingClientRect().top + window.scrollY - (top ? top.offsetHeight : 0) - 24;
+    var y = form.getBoundingClientRect().top + window.scrollY - 24;
     window.scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
     setTimeout(function () { focusStep(steps[current]); }, reduce ? 0 : 450);
   });
