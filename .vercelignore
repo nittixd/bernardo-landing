@@ -3,3 +3,4 @@ serve.js
 .gitignore
 .nojekyll
 .env*
+docs

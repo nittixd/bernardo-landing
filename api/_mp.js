@@ -4,7 +4,9 @@
      PRECIO_USD             valor de la consulta en dólares (200 por defecto)
      COTIZACION_CASA        cotización de dolarapi.com: oficial (defecto), bolsa (MEP) o blue
      PRECIO_ARS_RESPALDO    monto fijo en pesos si dolarapi no responde
-     PUBLIC_ORIGIN          dominio para volver de Mercado Pago (por defecto, el host del pedido) */
+     PUBLIC_ORIGIN          dominio para volver de Mercado Pago (por defecto, el host del pedido)
+     AVISOS_URL             URL del Apps Script de Bernardo (docs/apps-script.gs): guarda en su planilla y le manda el mail
+     AVISOS_CLAVE           la misma clave que figura en el Apps Script */
 'use strict';
 
 const crypto = require('crypto');
@@ -91,6 +93,8 @@ async function crearPreferencia(d, p, base) {
       pending: base + '/gracias',
       failure: base + '/gracias',
     },
+    // Mercado Pago avisa acá cada pago; si está aprobado, le llega a Bernardo con las respuestas
+    notification_url: base + '/api/mp-aviso?source_news=webhooks',
     auto_return: 'approved',
     // sin efectivo (Rapipago, Pago Fácil): quedan pendientes días y traban la reserva
     payment_methods: { excluded_payment_types: [{ id: 'ticket' }, { id: 'atm' }] },
@@ -115,4 +119,33 @@ async function crearPreferencia(d, p, base) {
   return { ref, url: j.init_point, id: j.id };
 }
 
-module.exports = { precio, validar, origen, crearPreferencia };
+/* Manda una fila al Apps Script de Bernardo. Devuelve false si no está configurado o falla. */
+async function avisar(datos) {
+  const url = process.env.AVISOS_URL;
+  if (!url) return false;
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Apps Script lee el cuerpo crudo
+      body: JSON.stringify(Object.assign({ clave: process.env.AVISOS_CLAVE || '' }, datos)),
+      redirect: 'follow',
+      signal: AbortSignal.timeout(8000),
+    });
+    const j = await r.json().catch(() => ({}));
+    return r.ok && j.ok === true;
+  } catch (e) {
+    console.error('avisar', e && e.message);
+    return false;
+  }
+}
+
+async function leerPago(id) {
+  const r = await fetch('https://api.mercadopago.com/v1/payments/' + encodeURIComponent(id), {
+    headers: { Authorization: 'Bearer ' + process.env.MP_ACCESS_TOKEN },
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!r.ok) throw new Error('pago ' + id + ': ' + r.status);
+  return r.json();
+}
+
+module.exports = { precio, validar, origen, crearPreferencia, avisar, leerPago };

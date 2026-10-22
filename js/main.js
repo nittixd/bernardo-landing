@@ -65,7 +65,6 @@
       paintBar(i);
       if (live) live.textContent = 'Paso ' + (i + 1) + ' de ' + steps.length;
       if (!opts.noFocus) focusStep(next);
-      if (i === 3) fetchPrice();
     };
     if (opts.instant || reduce || prev === next) go(); else setTimeout(go, 140);
   }
@@ -163,7 +162,7 @@
       var ars = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(p.ars);
       var note = form.querySelector('[data-precio]');
       var casa = p.casa === 'oficial' ? 'dólar oficial' : p.casa === 'bolsa' ? 'dólar MEP' : 'tipo de cambio';
-      if (note) note.textContent = 'Hoy son $ ' + ars + ' (USD 200 al ' + casa + ' del día). Se paga con Mercado Pago.';
+      if (note) note.textContent = 'Se paga en pesos con Mercado Pago: hoy son $ ' + ars + ', al ' + casa + ' del día.';
     }).catch(function () {});
   }
 
@@ -218,4 +217,49 @@
   });
 
   show(firstIncomplete(), { instant: true, noFocus: true });
+  if ('requestIdleCallback' in window) requestIdleCallback(fetchPrice, { timeout: 2500 }); else setTimeout(fetchPrice, 1200);
+
+  var det = document.querySelector('[data-detalle]');
+  if (det && CFG.detalleConsulta) { det.textContent = CFG.detalleConsulta; det.hidden = false; }
+})();
+
+/* recursos del podcast: email → /api/recursos */
+(function () {
+  'use strict';
+  var f = document.getElementById('recursos-form');
+  if (!f || !window.fetch) return;
+  var btn = f.querySelector('[data-sub-btn]');
+  var msg = f.querySelector('[data-sub-msg]');
+  var input = f.elements.email;
+  var busy = false;
+  function say(text, ok) {
+    msg.textContent = text;
+    msg.classList.toggle('is-ok', !!ok);
+    msg.classList.toggle('is-error', !ok);
+  }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (busy) return;
+    var email = (input.value || '').trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      input.setAttribute('aria-invalid', 'true');
+      say('Revisá el email.', false);
+      input.focus();
+      return;
+    }
+    input.removeAttribute('aria-invalid');
+    busy = true; btn.disabled = true; say('', true);
+    fetch('/api/recursos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ email: email })
+    }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.j && res.j.error);
+        f.reset();
+        say('Listo. Te vamos a mandar los recursos a ' + email + '.', true);
+      })
+      .catch(function (err) { say((err && err.message) || 'No pudimos registrar tu email. Probá de nuevo en un rato.', false); })
+      .then(function () { busy = false; btn.disabled = false; });
+  });
 })();
