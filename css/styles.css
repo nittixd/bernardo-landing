@@ -90,18 +90,19 @@ button, input, textarea { font: inherit; color: inherit; }
 .hero__title {
   margin: 0;
   max-width: 19ch;
-  font: 700 clamp(40px, 5.2vw, 62px)/1.04 var(--head);
+  font: 700 clamp(36px, 4.4vw, 54px)/1.05 var(--head);
   letter-spacing: -0.035em;
   text-wrap: balance;
 }
 .hero__lead {
   margin-top: 20px;
-  max-width: 34em;
-  font-size: clamp(17px, 1.6vw, 19px);
+  max-width: 36em;
+  font-size: clamp(18px, 1.75vw, 21px);
   line-height: 1.55;
-  color: var(--muted);
-  text-wrap: pretty;
+  color: var(--ink-2);
 }
+.hero__lead p { text-wrap: pretty; }
+.hero__lead p + p { margin-top: 12px; }
 
 /* ---------- tarjeta de preguntas ---------- */
 .quiz {
@@ -210,7 +211,9 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   background: transparent; color: var(--muted);
 }
 .btn--inline { width: auto; min-width: 260px; }
-.btn--light { min-height: 56px; padding: 0 26px; background: #fff; color: var(--navy-deep); margin-top: 28px; }
+.btn--light { min-height: 56px; padding: 0 26px; background: #fff; color: var(--navy-deep); }
+.btn--outline { min-height: 56px; padding: 0 26px; background: transparent; color: #fff; box-shadow: inset 0 0 0 1.25px rgba(255, 255, 255, .42); }
+.pod__links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
 
 @media (hover: hover) and (pointer: fine) {
   .opt:hover { border-color: var(--navy); }
@@ -218,6 +221,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   .btn--primary:hover { background: var(--navy-hover); }
   .btn--ghost:hover { color: var(--ink); }
   .btn--light:hover { background: #eef0f6; }
+  .btn--outline:hover { box-shadow: inset 0 0 0 1.25px #fff; }
 }
 
 .facts {
@@ -293,12 +297,14 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
   :root { --gutter: 16px; }
-  .hero__title { font-size: clamp(36px, 10.4vw, 44px); letter-spacing: -0.03em; }
+  .hero__title { font-size: clamp(32px, 9vw, 38px); letter-spacing: -0.03em; }
+  .hero__lead { font-size: 18px; }
   .quiz { padding: 22px 18px 24px; border-radius: 20px; }
   .what__cols { grid-template-columns: 1fr; gap: 28px; }
   .about__in { grid-template-columns: 1fr; }
   .about__photo { max-width: 460px; }
   .about__text .btn, .pod .btn { width: 100%; min-width: 0; }
+  .pod__links { width: 100%; flex-direction: column; }
   .foot__in { flex-direction: column; }
 }
 }

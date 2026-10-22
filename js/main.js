@@ -8,13 +8,6 @@
   function load() { try { return JSON.parse(sessionStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
   function save(d) { try { sessionStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} }
 
-  /* recursos del podcast */
-  var rec = document.querySelector('[data-recursos]');
-  if (rec) {
-    if (CFG.recursosUrl) rec.href = CFG.recursosUrl;
-    else rec.addEventListener('click', function (e) { e.preventDefault(); });
-  }
-
   var form = document.getElementById('quiz');
   if (!form) return;
 
