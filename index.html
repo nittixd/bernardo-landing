@@ -15,15 +15,15 @@
 <meta name="theme-color" content="#FAF8F3">
 <link rel="icon" type="image/png" href="/assets/favicon.png">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-<link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/archivo-400-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=4">
+<link rel="preload" href="/assets/fonts/intertight-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/satoshi-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css?v=5">
 <script>document.documentElement.classList.add('js')</script>
 <!--
 THESIS: la consulta paga como única puerta; el formulario de preguntas vive en el primer viewport (mecánica de la referencia Arcadia), sin el andamiaje de "clase en vivo".
-OWN-WORLD: brief de Bernardo (22/10): editorial contemporáneo, blanco roto #FAF8F3 y crema #F3EFE7, negro suave #1C1C1C, un solo acento verde inglés #234D3C. Fraunces 500 en títulos, Archivo en el cuerpo, IBM Plex Mono solo como condimento (rótulos, número de paso, precio, pie). Radios de 4 a 6 px, sin sombras.
+OWN-WORLD: brief de Bernardo (22/10): editorial contemporáneo, blanco roto #FAF8F3 y crema #F3EFE7, negro suave #1C1C1C, un solo acento verde inglés #234D3C. Tipografía de antes (José, 22/10): Inter Tight 700 en títulos, Satoshi en todo lo demás. Radios de 4 a 6 px, sin sombras.
 STORY: entiendo qué ofrece la consulta, respondo tres preguntas, dejo mis datos, pago con Mercado Pago y Bernardo me escribe para coordinar.
-FIRST VIEWPORT: el nombre centrado arriba, sin barra; titular Fraunces centrado; bajada de dos párrafos; tarjeta de 560px con la primera pregunta y el valor al pie.
+FIRST VIEWPORT: el nombre centrado arriba, sin barra; titular Inter Tight centrado; bajada de dos párrafos; tarjeta de 560px con la primera pregunta y el valor al pie.
 FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya teníamos.
 -->
 </head>
@@ -45,7 +45,7 @@ FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya te
 
       <form class="quiz" id="quiz" action="/api/checkout" method="post" novalidate>
         <div class="quiz__head">
-          <p class="quiz__intro">Antes de reservar · tres preguntas</p>
+          <p class="quiz__intro">Antes de reservar, tres preguntas para conocerte un poco.</p>
           <div class="quiz__bar" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
         </div>
 
