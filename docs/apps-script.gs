@@ -12,6 +12,7 @@
  *   4. Copiar la URL de la aplicación web (termina en /exec) y pasarla junto con la CLAVE.
  */
 const CLAVE = 'CAMBIAR-ESTA-CLAVE';
+const AVISAR_A = 'consultas@bernardovasquez.com.ar'; // el correo de Bernardo para las consultas
 
 function doPost(e) {
   let d = {};
@@ -34,7 +35,7 @@ function doPost(e) {
       h.appendRow([new Date(d.fecha || Date.now()), d.nombre, d.email, d.whatsapp, d.dedicacion, d.tema,
         d.decisiones, (d.moneda || '') + ' ' + (d.monto || ''), d.pago_id, '']);
       MailApp.sendEmail({
-        to: Session.getEffectiveUser().getEmail(),
+        to: AVISAR_A,
         subject: 'Nueva consulta paga: ' + d.nombre,
         body: [
           'Entró una consulta paga desde la web.',

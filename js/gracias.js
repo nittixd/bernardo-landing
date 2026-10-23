@@ -43,11 +43,15 @@
   if (estado === 'approved') {
     title.textContent = 'Listo, tu consulta está paga';
     var u = CFG.agendaUrl ? agendaUrl() : null;
-    if (u && /calendly\.com$/.test(u.hostname)) {
+    var google = u && u.hostname === 'calendar.google.com' && /\/appointments\//.test(u.pathname);
+    if (google) u.searchParams.set('gv', 'true'); // la versión embebible de la agenda de citas de Google
+    if (u && (google || /calendly\.com$/.test(u.hostname))) {
       text.textContent = 'Ahora elegí el día y el horario que te quede mejor.';
       action.hidden = true;
-      u.searchParams.set('embed_domain', location.hostname);
-      u.searchParams.set('embed_type', 'Inline');
+      if (!google) {
+        u.searchParams.set('embed_domain', location.hostname);
+        u.searchParams.set('embed_type', 'Inline');
+      }
       agenda.innerHTML = '<iframe title="Elegir día y horario" loading="lazy"></iframe>';
       agenda.firstChild.src = u.toString();
       agenda.hidden = false;
