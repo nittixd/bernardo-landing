@@ -52,7 +52,7 @@ module.exports = async (req, res) => {
 
     const token = await google.tokenDesdeRefresh(descifrar(d.google.refreshToken));
     const calendarId = d.google.calendarId || 'primary';
-    const ocupados = await google.horariosOcupados(token, calendarId, turno.inicio, turno.fin);
+    const ocupados = await google.horariosOcupados(token, calendarId, turno.inicio, turno.fin, turnos.IGNORAR_TITULOS);
     if (ocupados.some((o) => turno.inicio < o.fin && o.inicio < turno.fin)) {
       return res.status(409).json({ error: 'Ese horario se acaba de ocupar. Elegí otro.' });
     }

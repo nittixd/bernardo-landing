@@ -107,7 +107,8 @@ async function llamar(token, ruta, init) {
   return j;
 }
 
-async function listarOcupadosPorEventos(token, calendarId, desde, hasta) {
+async function listarOcupadosPorEventos(token, calendarId, desde, hasta, ignorar) {
+  const saltear = (ignorar || []).map((t) => String(t).trim().toLowerCase());
   const salida = [];
   let pagina;
   do {
@@ -116,6 +117,7 @@ async function listarOcupadosPorEventos(token, calendarId, desde, hasta) {
     const r = await llamar(token, '/calendars/' + encodeURIComponent(calendarId) + '/events?' + q);
     for (const ev of r.items || []) {
       if (ev.status === 'cancelled' || ev.transparency === 'transparent') continue;
+      if (saltear.includes(String(ev.summary || '').trim().toLowerCase())) continue;
       const yo = (ev.attendees || []).find((a) => a.self);
       if (yo && yo.responseStatus === 'declined') continue;
       const ini = ev.start.dateTime || ev.start.date + 'T00:00:00-03:00';
@@ -127,7 +129,9 @@ async function listarOcupadosPorEventos(token, calendarId, desde, hasta) {
   return salida;
 }
 
-async function horariosOcupados(token, calendarId, desde, hasta) {
+async function horariosOcupados(token, calendarId, desde, hasta, ignorar) {
+  // con títulos a ignorar hay que mirar los eventos uno por uno (freeBusy no trae títulos)
+  if (ignorar && ignorar.length) return listarOcupadosPorEventos(token, calendarId, desde, hasta, ignorar);
   try {
     const r = await llamar(token, '/freeBusy', {
       method: 'POST',

@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
     const r = turnos.rango(ahora);
     if (!r) return res.status(200).json({ disponible: true, dias: [] });
     const token = await google.tokenDesdeRefresh(descifrar(d.google.refreshToken));
-    const ocupados = await google.horariosOcupados(token, d.google.calendarId || 'primary', r.desde, r.hasta);
+    const ocupados = await google.horariosOcupados(token, d.google.calendarId || 'primary', r.desde, r.hasta, turnos.IGNORAR_TITULOS);
     const lista = turnos.libres(ahora, ocupados, d.reservas);
     const dias = [];
     for (const t of lista) {

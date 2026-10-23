@@ -12,6 +12,10 @@ const HORARIO = {
 const DURACION_MIN = 60;
 const AVISO_MINIMO_H = 12;   // no se ofrecen turnos que empiecen antes de 12 horas
 const DIAS_ADELANTE = 21;
+// Bloques genéricos de su calendario que NO cuentan como ocupado (23/10: Bernardo tiene un evento
+// repetido "ocupado" de lunes a viernes 8-14 y 15-20 que tapa justo sus horarios de consulta).
+// Todo lo demás que tenga en el calendario sí bloquea.
+const IGNORAR_TITULOS = ['ocupado'];
 const OFFSET_H = 3;          // UTC-3
 
 const min = (hhmm) => { const [h, m] = hhmm.split(':').map(Number); return h * 60 + m; };
@@ -64,4 +68,4 @@ function turnoValido(ahora, inicioIso) {
   return t || null;
 }
 
-module.exports = { HORARIO, DURACION_MIN, turnosDelHorario, rango, libres, turnoValido, local };
+module.exports = { HORARIO, DURACION_MIN, IGNORAR_TITULOS, turnosDelHorario, rango, libres, turnoValido, local };
