@@ -41,7 +41,13 @@ module.exports = async (req, res) => {
       return res.status(503).json({ error: 'La agenda todavía no está conectada. Te escribimos para coordinar el horario.' });
     }
 
-    const pago = await leerPago(pagoId);
+    let pago;
+    try {
+      pago = await leerPago(pagoId);
+    } catch (e) {
+      if (/: 40[04]$/.test(e.message)) return res.status(402).json({ error: 'No encontramos un pago aprobado con ese número.' });
+      throw e;
+    }
     if (pago.status !== 'approved' || !String(pago.external_reference || '').startsWith('bv-')) {
       return res.status(402).json({ error: 'No encontramos un pago aprobado con ese número.' });
     }
