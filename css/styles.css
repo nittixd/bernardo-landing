@@ -301,6 +301,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 
 .foot { border-top: 1px solid var(--line); padding: 28px var(--gutter) calc(28px + env(safe-area-inset-bottom)); text-align: center; }
 .foot p { font: 400 14px/1.6 var(--sans); color: var(--gray); }
+.foot a { color: var(--gray); text-underline-offset: 3px; }
 
 /* ---------- página de gracias ---------- */
 .done { padding: clamp(56px, 9vw, 112px) 0 clamp(72px, 10vw, 128px); }
