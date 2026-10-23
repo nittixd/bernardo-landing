@@ -54,6 +54,17 @@ function doPost(e) {
       });
       return salida({ ok: true });
     }
+    if (d.tipo === 'turno') {
+      // la persona eligió día y horario en la web: se anota en la fila de su pago
+      const h = hoja(libro, 'Consultas', ['Fecha de pago', 'Nombre', 'Email', 'WhatsApp', 'A qué se dedica',
+        'Sobre qué quiere conversar', 'Decisiones', 'Monto', 'N.º de pago', 'Coordinada']);
+      if (h.getLastRow() >= 2) {
+        const ids = h.getRange(2, 9, h.getLastRow() - 1, 1).getValues();
+        const i = ids.findIndex(function (f) { return String(f[0]) === String(d.pago_id); });
+        if (i >= 0) h.getRange(i + 2, 10).setValue(d.turno + (d.meet ? ' · ' + d.meet : ''));
+      }
+      return salida({ ok: true });
+    }
     return salida({ ok: false });
   } finally {
     lock.releaseLock();

@@ -26,7 +26,7 @@ const MIME = {
 
 function api(req, res, name) {
   const file = path.join(ROOT, 'api', name + '.js');
-  if (name.startsWith('_') || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+  if (name.split('/').some((p) => p.startsWith('_')) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
   let raw = '';
   req.on('data', (c) => { raw += c; });
   req.on('end', async () => {
@@ -38,7 +38,7 @@ function api(req, res, name) {
     res.json = (o) => { res.setHeader('Content-Type', 'application/json; charset=utf-8'); res.end(JSON.stringify(o)); return res; };
     try {
       delete require.cache[require.resolve(file)];
-      delete require.cache[require.resolve(path.join(ROOT, 'api', '_mp.js'))];
+      Object.keys(require.cache).filter((k) => k.startsWith(path.join(ROOT, 'api'))).forEach((k) => delete require.cache[k]);
       await require(file)(req, res);
     } catch (e) {
       console.error(e);
@@ -49,7 +49,7 @@ function api(req, res, name) {
 
 http.createServer((req, res) => {
   let urlPath = decodeURIComponent(req.url.split('?')[0]);
-  const m = /^\/api\/([\w-]+)\/?$/.exec(urlPath);
+  const m = /^\/api\/([\w-]+(?:\/[\w-]+)?)\/?$/.exec(urlPath);
   if (m) return api(req, res, m[1]);
   if (urlPath === '/') urlPath = '/index.html';
   let file = path.join(ROOT, urlPath);

@@ -4,3 +4,5 @@ serve.js
 .nojekyll
 .env*
 docs
+scripts
+.data

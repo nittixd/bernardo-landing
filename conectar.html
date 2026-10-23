@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Conectar tu calendario · Bernardo Vásquez</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FAF8F3">
+<link rel="icon" type="image/png" href="/assets/favicon.png?v=3">
+<link rel="preload" href="/assets/fonts/intertight-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css?v=6">
+</head>
+<body>
+<header class="name">
+  <a class="name__link" href="/">Bernardo Vásquez</a>
+</header>
+
+<main class="done">
+  <div class="wrap done__in">
+    <h1 class="done__title" data-title>Conectá tu Google Calendar</h1>
+    <p class="done__text" data-text>Es un solo paso. Las consultas que te reserven desde la web se agregan solas a tu calendario con el link de Meet, y los horarios que ya tenés ocupados no se ofrecen.</p>
+    <p class="done__small" data-cuenta>Entrá con la cuenta consultas@bernardovasquez.com.ar.</p>
+    <a class="btn btn--primary btn--inline" href="#" data-action hidden>Conectar mi Google Calendar</a>
+    <p class="done__small" data-nota hidden>Si Google avisa que la app no está verificada, tocá «Configuración avanzada» y después «Ir a la agenda». Podés quitar el permiso cuando quieras desde tu cuenta de Google.</p>
+    <p class="done__small done__small--error" data-error hidden></p>
+  </div>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Bernardo Vásquez Abogado · Fideicomisos de administración patrimonial</p>
+</footer>
+
+<script>
+(function () {
+  var q = new URLSearchParams(location.search);
+  var $ = function (s) { return document.querySelector(s); };
+  var ERRORES = {
+    link: 'Este link venció o no es válido. Pedile a José uno nuevo.',
+    estado: 'El permiso de Google tardó demasiado. Volvé a abrir el link que te pasó José.',
+    cancelado: 'No se completó el permiso en Google. Podés intentarlo de nuevo cuando quieras.',
+    permisos: 'Hace falta tildar los permisos del calendario en la pantalla de Google. Probá de nuevo y dejá todas las casillas marcadas.',
+    'sin-refresh': 'Google no devolvió el permiso permanente. Entrá a myaccount.google.com/permissions, quitá el acceso de la agenda y volvé a conectar.',
+    google: 'Google no respondió bien. Probá de nuevo en un rato.',
+    config: 'La conexión con Google todavía no está configurada. Avisale a José.'
+  };
+  var f = q.get('f'), error = q.get('error');
+  if (q.get('listo') === '1') {
+    $('[data-title]').textContent = 'Listo, tu calendario quedó conectado';
+    $('[data-text]').textContent = 'Desde ahora las consultas que te reserven aparecen solas en tu Google Calendar, con el link de Meet, y lo que ya tenés ocupado no se ofrece. Podés cerrar esta página.';
+    $('[data-cuenta]').textContent = q.get('cuenta') ? 'Cuenta conectada: ' + q.get('cuenta') : '';
+    return;
+  }
+  if (error) {
+    var e = $('[data-error]');
+    e.textContent = ERRORES[error] || ERRORES.google;
+    e.hidden = false;
+  }
+  if (f && error !== 'link') {
+    var a = $('[data-action]');
+    a.href = '/api/google/conectar?f=' + encodeURIComponent(f);
+    a.hidden = false;
+    $('[data-nota]').hidden = false;
+  } else if (!error) {
+    var e2 = $('[data-error]');
+    e2.textContent = ERRORES.link;
+    e2.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

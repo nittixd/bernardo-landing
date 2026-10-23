@@ -1,0 +1,9 @@
+{
+  "name": "bernardo-landing",
+  "private": true,
+  "description": "Landing de Bernardo Vásquez: consulta paga con Mercado Pago y agenda conectada a su Google Calendar",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@vercel/blob": "2.8.0"
+  }
+}
