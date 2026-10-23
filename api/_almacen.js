@@ -81,6 +81,16 @@ module.exports = {
   seSuperponen,
   async datos() { return (await leer()).datos; },
   async guardarGoogle(google) { await cambiar((d) => { d.google = google; }); },
+  async guardarDrive(cambios) { return cambiar((d) => { d.drive = Object.assign({}, d.drive || {}, cambios); return d.drive; }); },
+  /* Suma un mail a la lista de recursos; devuelve false si ya estaba. */
+  async agregarSuscripto(email) {
+    return cambiar((d) => {
+      d.suscriptos = d.suscriptos || [];
+      if (d.suscriptos.some((s) => s.email === email)) return false;
+      d.suscriptos.push({ email, fecha: new Date().toISOString() });
+      return true;
+    });
+  },
   /* Agrega la reserva si el horario sigue libre y el pago no se usó. Devuelve la existente si ya estaba. */
   async crearReserva(r) {
     return cambiar((d) => {

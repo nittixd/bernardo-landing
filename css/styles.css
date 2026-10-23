@@ -298,6 +298,8 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .sub__msg.is-ok { color: var(--green); }
 .sub__msg.is-error { color: var(--error); }
 .sub .mono-note { margin-top: 10px; }
+.sub__trampa { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.sub__abrir { display: inline-block; margin-top: 8px; font-weight: 500; text-underline-offset: 3px; }
 
 .foot { border-top: 1px solid var(--line); padding: 28px var(--gutter) calc(28px + env(safe-area-inset-bottom)); text-align: center; }
 .foot p { font: 400 14px/1.6 var(--sans); color: var(--gray); }

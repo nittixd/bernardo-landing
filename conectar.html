@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FAF8F3">
 <link rel="icon" type="image/png" href="/assets/favicon.png?v=3">
 <link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=7">
+<link rel="stylesheet" href="/css/styles.css?v=8">
 </head>
 <body>
 <header class="name">
@@ -44,6 +44,23 @@
     config: 'La conexión con Google todavía no está configurada. Avisale a José.'
   };
   var f = q.get('f'), error = q.get('error');
+  // ¿el link es para el Drive de la carpeta de recursos?
+  var esDrive = q.get('tipo') === 'drive';
+  try { if (f) esDrive = JSON.parse(atob(f.split('.')[0].replace(/-/g, '+').replace(/_/g, '/'))).pro === 'drive'; } catch (e) {}
+  ERRORES.carpeta = 'Se conectó tu Drive pero no pudimos crear la carpeta. Avisale a José.';
+  if (esDrive) {
+    document.title = 'Conectar tu Google Drive · Bernardo Vásquez';
+    if (q.get('listo') === '1') {
+      $('[data-title]').textContent = 'Listo, tu Drive quedó conectado';
+      $('[data-text]').textContent = 'Se creó la carpeta «Recursos · Antes que se lave» en tu Drive y Bernardo quedó como editor. Cada persona que deja su mail en la web recibe acceso de lectura. Podés cerrar esta página.';
+      $('[data-cuenta]').textContent = q.get('cuenta') ? 'Cuenta conectada: ' + q.get('cuenta') : '';
+      return;
+    }
+    $('[data-title]').textContent = 'Conectá tu Google Drive';
+    $('[data-text]').textContent = 'La web crea en tu Drive la carpeta «Recursos · Antes que se lave», suma a Bernardo como editor y le da acceso de lectura a cada persona que deja su mail. Solo puede tocar esa carpeta, no el resto de tu Drive.';
+    $('[data-cuenta]').textContent = 'Entrá con la cuenta de Google donde querés que quede la carpeta.';
+    $('[data-action]').textContent = 'Conectar mi Google Drive';
+  }
   if (q.get('listo') === '1') {
     $('[data-title]').textContent = 'Listo, tu calendario quedó conectado';
     $('[data-text]').textContent = 'Desde ahora las consultas que te reserven aparecen solas en tu Google Calendar, con el link de Meet, y lo que ya tenés ocupado no se ofrece. Podés cerrar esta página.';

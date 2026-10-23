@@ -252,12 +252,22 @@
     fetch('/api/recursos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ email: email })
+      body: JSON.stringify({ email: email, sitio: (f.elements.sitio && f.elements.sitio.value) || '' })
     }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.j && res.j.error);
         f.reset();
-        say('Listo. Te vamos a mandar los recursos a ' + email + '.', true);
+        if (res.j.url) {
+          say('Listo, ya tenés acceso. También te llegó un mail de Google a ' + email + ' con el link.', true);
+          var a = document.createElement('a');
+          a.href = res.j.url; a.target = '_blank'; a.rel = 'noopener';
+          a.className = 'sub__abrir';
+          a.textContent = 'Abrir la carpeta de recursos';
+          msg.appendChild(document.createElement('br'));
+          msg.appendChild(a);
+        } else {
+          say('Listo. Te vamos a mandar los recursos a ' + email + '.', true);
+        }
       })
       .catch(function (err) { say((err && err.message) || 'No pudimos registrar tu email. Probá de nuevo en un rato.', false); })
       .then(function () { busy = false; btn.disabled = false; });

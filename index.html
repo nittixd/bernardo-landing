@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
 <link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/satoshi-500.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=7">
+<link rel="stylesheet" href="/css/styles.css?v=8">
 <script>document.documentElement.classList.add('js')</script>
 <!--
 THESIS: la consulta paga como única puerta; el formulario de preguntas vive en el primer viewport (mecánica de la referencia Arcadia), sin el andamiaje de "clase en vivo".
@@ -165,7 +165,8 @@ FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya te
             <button class="btn btn--primary sub__btn" type="submit" data-sub-btn>Recibir recursos</button>
           </div>
           <p class="sub__msg" data-sub-msg aria-live="polite"></p>
-          <p class="mono-note">Un recurso por episodio, directo a tu correo.</p>
+          <input class="sub__trampa" type="text" name="sitio" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <p class="mono-note">Te damos acceso a la carpeta con un recurso por episodio.</p>
         </form>
       </div>
     </div>
@@ -177,6 +178,6 @@ FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya te
 </footer>
 
 <script src="/js/config.js?v=4"></script>
-<script src="/js/main.js?v=4"></script>
+<script src="/js/main.js?v=5"></script>
 </body>
 </html>

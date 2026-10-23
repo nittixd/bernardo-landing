@@ -8,6 +8,8 @@ const ALCANCES = [
   'https://www.googleapis.com/auth/calendar.events',
   'https://www.googleapis.com/auth/calendar.freebusy',
 ];
+// Drive de José para la carpeta de recursos: solo los archivos que crea esta app (no el resto del Drive)
+const ALCANCES_DRIVE = ['openid', 'email', 'https://www.googleapis.com/auth/drive.file'];
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const API = 'https://www.googleapis.com/calendar/v3';
 
@@ -33,14 +35,14 @@ function urlRedireccion() {
   return urlPublica() + '/api/google/callback';
 }
 
-function urlAutorizacion(estado, pista) {
+function urlAutorizacion(estado, pista, alcances) {
   const cred = credenciales();
   if (!cred) throw new Error('Faltan GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET');
   const q = new URLSearchParams({
     client_id: cred.id,
     redirect_uri: urlRedireccion(),
     response_type: 'code',
-    scope: ALCANCES.join(' '),
+    scope: (alcances || ALCANCES).join(' '),
     access_type: 'offline',
     prompt: 'consent', // sin esto Google no vuelve a mandar el refresh token
     include_granted_scopes: 'true',
@@ -64,7 +66,7 @@ async function pedirToken(cuerpo) {
   return j;
 }
 
-async function canjearCodigo(codigo) {
+async function canjearCodigo(codigo, alcances) {
   const cred = credenciales();
   if (!cred) throw new Error('Faltan GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET');
   const t = await pedirToken({
@@ -80,18 +82,19 @@ async function canjearCodigo(codigo) {
     email = JSON.parse(Buffer.from(t.id_token.split('.')[1], 'base64url').toString('utf8')).email;
   }
   const otorgados = String(t.scope || '').split(' ');
-  const faltan = ALCANCES.filter((a) => a.startsWith('https://') && !otorgados.includes(a));
+  const faltan = (alcances || ALCANCES).filter((a) => a.startsWith('https://') && !otorgados.includes(a));
   return { refreshToken: t.refresh_token, email, alcancesFaltantes: faltan };
 }
 
-let cache = null; // token de acceso en memoria hasta un minuto antes de vencer
+const cache = new Map(); // tokens de acceso en memoria hasta un minuto antes de vencer
 
 async function tokenDesdeRefresh(refreshToken) {
-  if (cache && cache.refresh === refreshToken && cache.vence > Date.now()) return cache.token;
+  const c = cache.get(refreshToken);
+  if (c && c.vence > Date.now()) return c.token;
   const cred = credenciales();
   if (!cred) throw new Error('Faltan GOOGLE_CLIENT_ID y GOOGLE_CLIENT_SECRET');
   const t = await pedirToken({ refresh_token: refreshToken, client_id: cred.id, client_secret: cred.secreto, grant_type: 'refresh_token' });
-  cache = { refresh: refreshToken, token: t.access_token, vence: Date.now() + (t.expires_in - 60) * 1000 };
+  cache.set(refreshToken, { token: t.access_token, vence: Date.now() + (t.expires_in - 60) * 1000 });
   return t.access_token;
 }
 
@@ -164,4 +167,4 @@ async function crearEvento(token, calendarId, e) {
   return { id: ev.id, meetUrl: ev.hangoutLink || (video && video.uri) || '' };
 }
 
-module.exports = { ErrorGoogle, credenciales, urlPublica, urlAutorizacion, canjearCodigo, tokenDesdeRefresh, horariosOcupados, crearEvento };
+module.exports = { ALCANCES, ALCANCES_DRIVE, ErrorGoogle, credenciales, urlPublica, urlAutorizacion, canjearCodigo, tokenDesdeRefresh, horariosOcupados, crearEvento };
