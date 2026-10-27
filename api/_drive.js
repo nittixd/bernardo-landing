@@ -1,23 +1,32 @@
 'use strict';
-/* Carpeta de recursos del podcast en el Google Drive de José (permiso drive.file: la app solo ve
-   lo que ella misma crea). Bernardo queda como editor; cada persona que deja su mail, como lectora. */
+/* Recursos del podcast en Google Drive (permiso drive.file: la app solo ve lo que ella misma crea).
+   Estructura (pedido de José, 27/10):
+     Podcast · Antes que se lave          ← carpeta principal, Bernardo (consultas@) como editor
+       ├─ Recursos                        ← acá Bernardo sube el material; cada mail recibe acceso de LECTURA solo a esta
+       └─ Mails (Google Sheets)           ← cada mail que se deja en la web cae solo como una fila
+   Quien deja su mail nunca ve la planilla: el acceso se le da a la subcarpeta Recursos. */
 const almacen = require('./_almacen');
 const google = require('./_google');
 const { descifrar } = require('./_seguridad');
 
-const API = 'https://www.googleapis.com/drive/v3';
-const NOMBRE_CARPETA = 'Recursos · Antes que se lave';
+const DRIVE = 'https://www.googleapis.com/drive/v3';
+const SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
+const NOMBRE_PRINCIPAL = 'Podcast · Antes que se lave';
+const NOMBRE_RECURSOS = 'Recursos';
+const NOMBRE_PLANILLA = 'Mails';
+const CARPETA = 'application/vnd.google-apps.folder';
+const PLANILLA = 'application/vnd.google-apps.spreadsheet';
 const EDITOR = 'consultas@bernardovasquez.com.ar';
 
-async function llamar(token, ruta, init) {
+async function llamar(token, url, init) {
   init = init || {};
-  const r = await fetch(API + ruta, Object.assign({}, init, {
+  const r = await fetch(url, Object.assign({}, init, {
     headers: Object.assign({ Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, init.headers || {}),
     signal: AbortSignal.timeout(10000),
   }));
   const j = await r.json().catch(() => ({}));
   if (!r.ok) {
-    const e = new Error('Drive ' + r.status + ': ' + ((j.error && j.error.message) || r.statusText));
+    const e = new Error('Google ' + r.status + ': ' + ((j.error && j.error.message) || r.statusText));
     e.estado = r.status;
     e.razon = j.error && j.error.errors && j.error.errors[0] && j.error.errors[0].reason;
     throw e;
@@ -25,52 +34,108 @@ async function llamar(token, ruta, init) {
   return j;
 }
 
-async function token() {
+async function sesion() {
   const d = await almacen.datos();
   if (!d.drive || !d.drive.refreshToken) return null;
   return { d, token: await google.tokenDesdeRefresh(descifrar(d.drive.refreshToken)) };
 }
 
-function compartir(tk, carpetaId, email, rol, mensaje) {
+async function existe(tk, id) {
+  if (!id) return false;
+  try {
+    const f = await llamar(tk, DRIVE + '/files/' + encodeURIComponent(id) + '?fields=id,trashed');
+    return !f.trashed;
+  } catch (e) {
+    if (e.estado === 404) return false;
+    throw e;
+  }
+}
+
+async function crear(tk, nombre, tipo, padre) {
+  return llamar(tk, DRIVE + '/files?fields=id,webViewLink', {
+    method: 'POST',
+    body: JSON.stringify(Object.assign({ name: nombre, mimeType: tipo }, padre ? { parents: [padre] } : {})),
+  });
+}
+
+function compartir(tk, id, email, rol, mensaje) {
   const q = new URLSearchParams({ sendNotificationEmail: 'true', fields: 'id' });
   if (mensaje) q.set('emailMessage', mensaje);
-  return llamar(tk, '/files/' + encodeURIComponent(carpetaId) + '/permissions?' + q, {
+  return llamar(tk, DRIVE + '/files/' + encodeURIComponent(id) + '/permissions?' + q, {
     method: 'POST',
     body: JSON.stringify({ type: 'user', role: rol, emailAddress: email }),
   });
 }
 
-/* Crea la carpeta si no existe y suma a Bernardo como editor. Se llama al conectar el Drive. */
+/* Deja armada la estructura. Es idempotente: crea solo lo que falta. Se llama al conectar el Drive. */
 async function prepararCarpeta() {
-  const t = await token();
-  if (!t) throw new Error('Drive sin conectar');
-  let { carpetaId, carpetaUrl, editorOk } = t.d.drive;
-  if (carpetaId) {
-    try { await llamar(t.token, '/files/' + encodeURIComponent(carpetaId) + '?fields=id,trashed'); } catch (e) { if (e.estado === 404) carpetaId = null; else throw e; }
+  const s = await sesion();
+  if (!s) throw new Error('Drive sin conectar');
+  const tk = s.token;
+  const dr = Object.assign({}, s.d.drive);
+  const yo = String(dr.email || '').toLowerCase();
+
+  if (!(await existe(tk, dr.carpetaId))) {
+    const f = await crear(tk, NOMBRE_PRINCIPAL, CARPETA);
+    Object.assign(dr, { carpetaId: f.id, carpetaUrl: f.webViewLink, editorOk: false, recursosId: null, planillaId: null });
+  } else {
+    // la carpeta de la primera versión se llamaba "Recursos · Antes que se lave"
+    await llamar(tk, DRIVE + '/files/' + encodeURIComponent(dr.carpetaId), { method: 'PATCH', body: JSON.stringify({ name: NOMBRE_PRINCIPAL }) });
   }
-  if (!carpetaId) {
-    const f = await llamar(t.token, '/files?fields=id,webViewLink', {
-      method: 'POST',
-      body: JSON.stringify({ name: NOMBRE_CARPETA, mimeType: 'application/vnd.google-apps.folder' }),
+
+  if (!(await existe(tk, dr.recursosId))) {
+    const f = await crear(tk, NOMBRE_RECURSOS, CARPETA, dr.carpetaId);
+    Object.assign(dr, { recursosId: f.id, recursosUrl: f.webViewLink || 'https://drive.google.com/drive/folders/' + f.id });
+  }
+
+  if (!(await existe(tk, dr.planillaId))) {
+    const f = await crear(tk, NOMBRE_PLANILLA, PLANILLA, dr.carpetaId);
+    Object.assign(dr, { planillaId: f.id, planillaUrl: f.webViewLink || 'https://docs.google.com/spreadsheets/d/' + f.id });
+    await llamar(tk, SHEETS + '/' + f.id + '/values/A1:C1?valueInputOption=RAW', {
+      method: 'PUT',
+      body: JSON.stringify({ values: [['Fecha', 'Email', 'Acceso a Recursos']] }),
     });
-    carpetaId = f.id;
-    carpetaUrl = f.webViewLink || 'https://drive.google.com/drive/folders/' + f.id;
-    editorOk = false;
   }
-  if (!editorOk) {
-    await compartir(t.token, carpetaId, EDITOR, 'writer', 'Bernardo, esta es la carpeta de los recursos del podcast. Lo que subas acá lo ve cada persona que deja su mail en la web.');
-    editorOk = true;
+
+  // si la conectó otra cuenta (no la de Bernardo), Bernardo queda como editor de toda la carpeta
+  if (!dr.editorOk) {
+    if (yo !== EDITOR) {
+      await compartir(tk, dr.carpetaId, EDITOR, 'writer',
+        'Bernardo, en «Recursos» subí el material del podcast y en «Mails» vas a ver a cada persona que lo pidió desde la web.');
+    }
+    dr.editorOk = true;
   }
-  return almacen.guardarDrive({ carpetaId, carpetaUrl, editorOk, editor: EDITOR });
+
+  return almacen.guardarDrive(dr);
 }
 
-/* Le da acceso de lectura a quien dejó su mail. Google le manda el aviso con el link. */
+/* Anota el mail en la planilla y le da acceso de lectura a la carpeta Recursos (Google le avisa). */
 async function darAcceso(email) {
-  const t = await token();
-  if (!t || !t.d.drive.carpetaId) return null;
-  await compartir(t.token, t.d.drive.carpetaId, email, 'reader',
-    'Acá tenés los recursos del podcast Antes que se lave. Cada episodio suma uno nuevo en esta carpeta.');
-  return t.d.drive.carpetaUrl;
+  const s = await sesion();
+  if (!s || !s.d.drive.recursosId) return null;
+  const dr = s.d.drive;
+  let acceso = 'sí';
+  try {
+    await compartir(s.token, dr.recursosId, email, 'reader',
+      'Acá tenés los recursos del podcast Antes que se lave. Cada episodio suma uno nuevo en esta carpeta.');
+  } catch (e) {
+    acceso = 'no (' + (e.razon || e.estado) + ')';
+    await anotar(s.token, dr.planillaId, email, acceso).catch(() => {});
+    throw e;
+  }
+  await anotar(s.token, dr.planillaId, email, acceso);
+  return dr.recursosUrl;
 }
 
-module.exports = { prepararCarpeta, darAcceso, NOMBRE_CARPETA, EDITOR };
+function anotar(tk, planillaId, email, acceso) {
+  if (!planillaId) return Promise.resolve();
+  const fecha = new Intl.DateTimeFormat('es-AR', {
+    timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
+  }).format(new Date());
+  return llamar(tk, SHEETS + '/' + planillaId + '/values/A:C:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', {
+    method: 'POST',
+    body: JSON.stringify({ values: [[fecha, email, acceso]] }),
+  });
+}
+
+module.exports = { prepararCarpeta, darAcceso, NOMBRE_PRINCIPAL, EDITOR };

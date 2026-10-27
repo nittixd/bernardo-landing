@@ -87,7 +87,7 @@ button, input, textarea { font: inherit; color: inherit; }
 .name__link {
   font: 600 clamp(20px, 1.8vw, 22px)/1 var(--serif);
   letter-spacing: .01em;
-  color: var(--ink);
+  color: var(--green);
   text-decoration: none;
 }
 

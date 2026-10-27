@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FAF8F3">
 <link rel="icon" type="image/png" href="/assets/favicon.png?v=3">
 <link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=8">
+<link rel="stylesheet" href="/css/styles.css?v=9">
 </head>
 <body>
 <header class="name">
@@ -52,12 +52,12 @@
     document.title = 'Conectar tu Google Drive · Bernardo Vásquez';
     if (q.get('listo') === '1') {
       $('[data-title]').textContent = 'Listo, tu Drive quedó conectado';
-      $('[data-text]').textContent = 'Se creó la carpeta «Recursos · Antes que se lave» en tu Drive y Bernardo quedó como editor. Cada persona que deja su mail en la web recibe acceso de lectura. Podés cerrar esta página.';
+      $('[data-text]').textContent = 'En tu Drive quedó la carpeta «Podcast · Antes que se lave» con «Recursos» (subí ahí el material) y la planilla «Mails», donde cae cada persona que lo pide desde la web. Quien deja su mail recibe acceso solo a «Recursos». Podés cerrar esta página.';
       $('[data-cuenta]').textContent = q.get('cuenta') ? 'Cuenta conectada: ' + q.get('cuenta') : '';
       return;
     }
     $('[data-title]').textContent = 'Conectá tu Google Drive';
-    $('[data-text]').textContent = 'La web crea en tu Drive la carpeta «Recursos · Antes que se lave», suma a Bernardo como editor y le da acceso de lectura a cada persona que deja su mail. Solo puede tocar esa carpeta, no el resto de tu Drive.';
+    $('[data-text]').textContent = 'La web crea en tu Drive la carpeta «Podcast · Antes que se lave» con «Recursos» y la planilla «Mails». Cada mail que se deja en la web cae en la planilla y recibe acceso de lectura a «Recursos». Solo puede tocar esa carpeta, no el resto de tu Drive.';
     $('[data-cuenta]').textContent = 'Entrá con la cuenta de Google donde querés que quede la carpeta.';
     $('[data-action]').textContent = 'Conectar mi Google Drive';
   }
