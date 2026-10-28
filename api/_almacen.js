@@ -81,6 +81,7 @@ module.exports = {
   seSuperponen,
   async datos() { return (await leer()).datos; },
   async guardarGoogle(google) { await cambiar((d) => { d.google = google; }); },
+  async guardarGmail(gmail) { await cambiar((d) => { d.gmail = gmail; }); },
   async guardarDrive(cambios) { return cambiar((d) => { d.drive = Object.assign({}, d.drive || {}, cambios); return d.drive; }); },
   /* Suma un mail a la lista de recursos; devuelve false si ya estaba. */
   async agregarSuscripto(email) {

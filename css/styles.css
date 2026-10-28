@@ -349,6 +349,16 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 }
 .done__small--error { color: var(--error); }
 
+/* ---------- página de gracias de los recursos ---------- */
+.rec__tapa { margin: 0 0 28px; width: 168px; aspect-ratio: 1; border: 1px solid var(--line-2); border-radius: 6px; overflow: hidden; background: var(--cream); }
+.rec__tapa img { width: 100%; height: 100%; object-fit: cover; }
+.done .done__small a { color: var(--green); text-underline-offset: 3px; }
+.rec__consulta { background: var(--cream); padding: clamp(64px, 8vw, 96px) 0; }
+.rec__in { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.rec__in .h2 { max-width: 18em; }
+.rec__texto { margin-top: 16px; max-width: 34em; font-size: 17px; line-height: 1.6; color: var(--gray-cream); text-wrap: pretty; }
+.rec__in .btn { margin-top: 28px; }
+
 /* ---------- mobile ---------- */
 @media (max-width: 760px) {
   :root { --gutter: 16px; }

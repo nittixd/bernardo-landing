@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tus recursos · Bernardo Vásquez</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FAF8F3">
+<link rel="icon" href="/favicon.ico?v=1" sizes="any">
+<link rel="icon" type="image/png" href="/assets/favicon.png?v=3">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
+<link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/styles.css?v=10">
+</head>
+<body>
+<header class="name">
+  <a class="name__link" href="/">Bernardo Vásquez</a>
+</header>
+
+<main>
+  <section class="done">
+    <div class="wrap done__in">
+      <figure class="rec__tapa">
+        <img src="/assets/img/podcast.jpg?v=2" alt="Tapa del podcast Antes que se lave" width="897" height="897">
+      </figure>
+      <h1 class="done__title" data-title>Ya tenés los recursos</h1>
+      <p class="done__text" data-text>Te mandamos el link a tu correo para que lo tengas siempre a mano. También podés abrir la carpeta ahora.</p>
+      <a class="btn btn--primary btn--inline" href="#" data-abrir target="_blank" rel="noopener" hidden>Abrir la carpeta de recursos</a>
+      <p class="done__small">Escuchá el podcast en <a href="https://open.spotify.com/show/4FPvEeHhSBF6m99hFN5Qcb" target="_blank" rel="noopener">Spotify</a> o <a href="https://podcasts.apple.com/ar/podcast/antes-que-se-lave/id6811762344" target="_blank" rel="noopener">Apple Podcasts</a>.</p>
+    </div>
+  </section>
+
+  <section class="rec__consulta">
+    <div class="wrap rec__in">
+      <h2 class="h2">¿Querés revisar cómo está organizado tu patrimonio?</h2>
+      <p class="rec__texto">Durante una hora analizamos tu situación: tus bienes, tu actividad, cómo están organizados y qué querés resolver. A partir de ahí te asesoro sobre qué conviene ordenar y si un fideicomiso tiene sentido para vos.</p>
+      <a class="btn btn--primary btn--inline" href="/#reservar">Reservar una consulta <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4 10h11m-4.5-4.5L15 10l-4.5 4.5"/></svg></a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 Bernardo Vásquez Abogado · Fideicomisos de administración patrimonial · <a href="/privacidad">Privacidad</a></p>
+</footer>
+
+<script>
+(function () {
+  var r = {};
+  try { r = JSON.parse(sessionStorage.getItem('bv-recursos')) || {}; } catch (e) {}
+  var abrir = document.querySelector('[data-abrir]');
+  if (r.url) {
+    abrir.href = r.url;
+    abrir.hidden = false;
+    if (r.email) document.querySelector('[data-text]').textContent = 'Te mandamos el link a ' + r.email + ' para que lo tengas siempre a mano. También podés abrir la carpeta ahora.';
+  } else {
+    document.querySelector('[data-title]').textContent = 'Los recursos del podcast';
+    document.querySelector('[data-text]').textContent = 'Si ya dejaste tu mail, revisá tu correo: ahí tenés el link a la carpeta. Si todavía no, podés pedirlos desde la página principal.';
+    abrir.textContent = 'Pedir los recursos';
+    abrir.href = '/#recursos';
+    abrir.removeAttribute('target');
+    abrir.hidden = false;
+  }
+})();
+</script>
+</body>
+</html>

@@ -10,6 +10,8 @@ const ALCANCES = [
 ];
 // Drive de José para la carpeta de recursos: solo los archivos que crea esta app (no el resto del Drive)
 const ALCANCES_DRIVE = ['openid', 'email', 'https://www.googleapis.com/auth/drive.file'];
+// Gmail de Bernardo: solo enviar (no lee nada), para el mail de bienvenida de los recursos
+const ALCANCES_GMAIL = ['openid', 'email', 'https://www.googleapis.com/auth/gmail.send'];
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const API = 'https://www.googleapis.com/calendar/v3';
 
@@ -167,4 +169,4 @@ async function crearEvento(token, calendarId, e) {
   return { id: ev.id, meetUrl: ev.hangoutLink || (video && video.uri) || '' };
 }
 
-module.exports = { ALCANCES, ALCANCES_DRIVE, ErrorGoogle, credenciales, urlPublica, urlAutorizacion, canjearCodigo, tokenDesdeRefresh, horariosOcupados, crearEvento };
+module.exports = { ALCANCES, ALCANCES_DRIVE, ALCANCES_GMAIL, ErrorGoogle, credenciales, urlPublica, urlAutorizacion, canjearCodigo, tokenDesdeRefresh, horariosOcupados, crearEvento };

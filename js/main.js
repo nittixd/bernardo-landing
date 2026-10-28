@@ -258,16 +258,11 @@
         if (!res.ok) throw new Error(res.j && res.j.error);
         f.reset();
         if (res.j.url) {
-          say('Listo, ya tenés acceso. También te llegó un mail de Google a ' + email + ' con el link.', true);
-          var a = document.createElement('a');
-          a.href = res.j.url; a.target = '_blank'; a.rel = 'noopener';
-          a.className = 'sub__abrir';
-          a.textContent = 'Abrir la carpeta de recursos';
-          msg.appendChild(document.createElement('br'));
-          msg.appendChild(a);
-        } else {
-          say('Listo. Te vamos a mandar los recursos a ' + email + '.', true);
+          try { sessionStorage.setItem('bv-recursos', JSON.stringify({ url: res.j.url, email: email })); } catch (e) {}
+          window.location.href = '/recursos';
+          return;
         }
+        say('Listo. Te vamos a mandar los recursos a ' + email + '.', true);
       })
       .catch(function (err) { say((err && err.message) || 'No pudimos registrar tu email. Probá de nuevo en un rato.', false); })
       .then(function () { busy = false; btn.disabled = false; });

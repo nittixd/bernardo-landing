@@ -8,6 +8,7 @@
 const almacen = require('./_almacen');
 const google = require('./_google');
 const { descifrar } = require('./_seguridad');
+const correo = require('./_correo');
 
 const DRIVE = 'https://www.googleapis.com/drive/v3';
 const SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
@@ -58,9 +59,9 @@ async function crear(tk, nombre, tipo, padre) {
   });
 }
 
-function compartir(tk, id, email, rol, mensaje) {
-  const q = new URLSearchParams({ sendNotificationEmail: 'true', fields: 'id' });
-  if (mensaje) q.set('emailMessage', mensaje);
+function compartir(tk, id, email, rol, mensaje, avisar) {
+  const q = new URLSearchParams({ sendNotificationEmail: avisar === false ? 'false' : 'true', fields: 'id' });
+  if (mensaje && avisar !== false) q.set('emailMessage', mensaje);
   return llamar(tk, DRIVE + '/files/' + encodeURIComponent(id) + '/permissions?' + q, {
     method: 'POST',
     body: JSON.stringify({ type: 'user', role: rol, emailAddress: email }),
@@ -91,9 +92,9 @@ async function prepararCarpeta() {
   if (!(await existe(tk, dr.planillaId))) {
     const f = await crear(tk, NOMBRE_PLANILLA, PLANILLA, dr.carpetaId);
     Object.assign(dr, { planillaId: f.id, planillaUrl: f.webViewLink || 'https://docs.google.com/spreadsheets/d/' + f.id });
-    await llamar(tk, SHEETS + '/' + f.id + '/values/A1:C1?valueInputOption=RAW', {
+    await llamar(tk, SHEETS + '/' + f.id + '/values/A1:D1?valueInputOption=RAW', {
       method: 'PUT',
-      body: JSON.stringify({ values: [['Fecha', 'Email', 'Acceso a Recursos']] }),
+      body: JSON.stringify({ values: [['Fecha', 'Email', 'Acceso a Recursos', 'Aviso']] }),
     });
   }
 
@@ -109,32 +110,51 @@ async function prepararCarpeta() {
   return almacen.guardarDrive(dr);
 }
 
-/* Anota el mail en la planilla y le da acceso de lectura a la carpeta Recursos (Google le avisa). */
+/* Le da acceso de lectura a la carpeta Recursos, le manda el mail de bienvenida desde la casilla de
+   Bernardo (si conectó su Gmail; si no, avisa Google Drive) y lo anota en la planilla. */
 async function darAcceso(email) {
   const s = await sesion();
   if (!s || !s.d.drive.recursosId) return null;
   const dr = s.d.drive;
-  let acceso = 'sí';
+  const conGmail = !!(s.d.gmail && s.d.gmail.refreshToken);
+  const MENSAJE = 'Acá tenés los recursos del podcast Antes que se lave. Cada episodio suma uno nuevo en esta carpeta.';
+  let aviso = 'aviso de Google Drive';
   try {
-    await compartir(s.token, dr.recursosId, email, 'reader',
-      'Acá tenés los recursos del podcast Antes que se lave. Cada episodio suma uno nuevo en esta carpeta.');
+    if (conGmail) {
+      try {
+        await compartir(s.token, dr.recursosId, email, 'reader', null, false);
+      } catch (e) {
+        // a un mail que no es de Google, Drive solo le comparte con aviso
+        if (e.estado !== 400 && e.estado !== 403) throw e;
+        await compartir(s.token, dr.recursosId, email, 'reader', MENSAJE, true);
+      }
+    } else {
+      await compartir(s.token, dr.recursosId, email, 'reader', MENSAJE, true);
+    }
   } catch (e) {
-    acceso = 'no (' + (e.razon || e.estado) + ')';
-    await anotar(s.token, dr.planillaId, email, acceso).catch(() => {});
+    await anotar(s.token, dr.planillaId, email, 'no (' + (e.razon || e.estado) + ')', '').catch(() => {});
     throw e;
   }
-  await anotar(s.token, dr.planillaId, email, acceso);
+  if (conGmail) {
+    try {
+      if (await correo.enviarRecursos(email, dr.recursosUrl)) aviso = 'mail de Bernardo';
+    } catch (e) {
+      console.error('mail de recursos', e && e.message);
+      aviso = 'falló el mail (' + String(e.message).slice(0, 40) + ')';
+    }
+  }
+  await anotar(s.token, dr.planillaId, email, 'sí', aviso);
   return dr.recursosUrl;
 }
 
-function anotar(tk, planillaId, email, acceso) {
+function anotar(tk, planillaId, email, acceso, aviso) {
   if (!planillaId) return Promise.resolve();
   const fecha = new Intl.DateTimeFormat('es-AR', {
     timeZone: 'America/Argentina/Buenos_Aires', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false,
   }).format(new Date());
-  return llamar(tk, SHEETS + '/' + planillaId + '/values/A:C:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', {
+  return llamar(tk, SHEETS + '/' + planillaId + '/values/A:D:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS', {
     method: 'POST',
-    body: JSON.stringify({ values: [[fecha, email, acceso]] }),
+    body: JSON.stringify({ values: [[fecha, email, acceso, aviso || '']] }),
   });
 }
 

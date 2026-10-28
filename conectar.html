@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#FAF8F3">
 <link rel="icon" type="image/png" href="/assets/favicon.png?v=3">
 <link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=9">
+<link rel="stylesheet" href="/css/styles.css?v=10">
 </head>
 <body>
 <header class="name">
@@ -48,6 +48,20 @@
   var esDrive = q.get('tipo') === 'drive';
   try { if (f) esDrive = JSON.parse(atob(f.split('.')[0].replace(/-/g, '+').replace(/_/g, '/'))).pro === 'drive'; } catch (e) {}
   ERRORES.carpeta = 'Se conectó tu Drive pero no pudimos crear la carpeta. Avisale a José.';
+  var esGmail = q.get('tipo') === 'gmail';
+  try { if (f) esGmail = JSON.parse(atob(f.split('.')[0].replace(/-/g, '+').replace(/_/g, '/'))).pro === 'gmail'; } catch (e) {}
+  if (esGmail) {
+    document.title = 'Conectar tu Gmail · Bernardo Vásquez';
+    if (q.get('listo') === '1') {
+      $('[data-title]').textContent = 'Listo, tu Gmail quedó conectado';
+      $('[data-text]').textContent = 'Desde ahora, cuando alguien pide los recursos del podcast en la web, le llega un mail tuyo desde ' + (q.get('cuenta') || 'tu casilla') + ' con el link a la carpeta. Podés cerrar esta página.';
+      $('[data-cuenta]').textContent = '';
+      return;
+    }
+    $('[data-title]').textContent = 'Conectá tu Gmail';
+    $('[data-text]').textContent = 'Así, cuando alguien pide los recursos del podcast, le llega un mail tuyo con el link a la carpeta en lugar del aviso genérico de Google Drive. El permiso es solo para enviar: la web no puede leer tus mails.';
+    $('[data-action]').textContent = 'Conectar mi Gmail';
+  }
   if (esDrive) {
     document.title = 'Conectar tu Google Drive · Bernardo Vásquez';
     if (q.get('listo') === '1') {
