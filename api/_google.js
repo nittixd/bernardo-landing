@@ -156,8 +156,9 @@ async function crearEvento(token, calendarId, e) {
   const cuerpo = {
     summary: e.titulo,
     description: e.descripcion,
-    start: { dateTime: e.inicio.toISOString() },
-    end: { dateTime: e.fin.toISOString() },
+    // con la zona escrita, la invitación dice «hora de Argentina» aunque el calendario esté en otra
+    start: { dateTime: e.inicio.toISOString(), timeZone: 'America/Argentina/Buenos_Aires' },
+    end: { dateTime: e.fin.toISOString(), timeZone: 'America/Argentina/Buenos_Aires' },
     attendees: e.invitado ? [{ email: e.invitado.email, displayName: e.invitado.nombre }] : undefined,
     extendedProperties: { private: { agendaReserva: e.reservaId } },
     conferenceData: { createRequest: { requestId: 'agenda-' + e.reservaId, conferenceSolutionKey: { type: 'hangoutsMeet' } } },
