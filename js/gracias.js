@@ -106,7 +106,8 @@
     var ini = new Date(r.inicio), suya = tuHora(ini);
     text.textContent = 'Te espero el ' + fLarga.format(ini) + ' a las ' + fHora.format(ini) +
       (suya ? ', hora de Argentina (' + suya + ' en tu hora),' : '') + ' por Google Meet.' +
-      (r.email ? ' Te llegó la invitación a ' + r.email + ' con el link de la videollamada.' : '');
+      // Gmail marca la invitación como de remitente desconocido y no la suma sola al calendario: hay que confirmarla
+      (r.email ? ' Te mandamos la invitación a ' + r.email + ' con el link de la videollamada. Abrila y confirmá tu asistencia así queda en tu calendario.' : '');
     // para cambiar el horario, por mail (sin innerHTML: el número de pago viene de la URL)
     var mail = 'consultas@bernardovasquez.com.ar';
     var a = document.createElement('a');
