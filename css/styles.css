@@ -176,6 +176,30 @@ button, input, textarea { font: inherit; color: inherit; }
 .field[aria-invalid="true"] { border-color: var(--error); }
 .field--area { resize: vertical; min-height: 104px; }
 
+/* WhatsApp con país: el select nativo va invisible encima del chip, así en el celular abre el selector del teléfono */
+.tel { display: flex; gap: 8px; }
+.tel__pais { position: relative; flex: none; }
+.tel__chip {
+  display: flex; align-items: center; gap: 6px; height: 100%;
+  padding: 0 10px 0 12px;
+  font-size: 16px; line-height: 1; color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  border-radius: 4px;
+  transition: border-color var(--t-ui) ease, box-shadow var(--t-ui) ease;
+}
+.tel__chip svg { width: 14px; height: 14px; color: var(--gray); }
+.tel__select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: 0; cursor: pointer; font-size: 16px;
+  -webkit-appearance: none; appearance: none;
+}
+.tel__pais:has(.tel__select:focus-visible) .tel__chip { border-color: var(--green); box-shadow: 0 0 0 3px rgba(35, 77, 60, .14); }
+.tel .tel__num { flex: 1; min-width: 0; margin-top: 0; }
+@media (hover: hover) and (pointer: fine) {
+  .tel__pais:hover .tel__chip { border-color: var(--green); }
+}
+
 /* opciones a lo ancho con flecha */
 .opts { display: grid; gap: 10px; margin-top: 22px; }
 .opt {
@@ -340,6 +364,10 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   transition: border-color var(--t-ui) ease, background-color var(--t-ui) ease, transform var(--t-press) var(--ease-out);
 }
 .slots__time.is-on { background: var(--green); border-color: var(--green); color: var(--paper); }
+/* visitas de otra zona: la hora de Argentina arriba y la suya abajo */
+.slots--zona .slots__times { grid-template-columns: repeat(auto-fill, minmax(136px, 1fr)); }
+.slots__time small { display: block; margin-top: 6px; font: 500 12.5px/1.3 var(--sans); color: var(--gray); }
+.slots__time.is-on small { color: rgba(250, 248, 243, .82); }
 .slots__err { font-size: 14px; color: var(--error); }
 .slots__err:not(:empty) { margin-top: 12px; }
 .slots .btn--primary { margin-top: 20px; }

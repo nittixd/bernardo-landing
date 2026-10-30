@@ -10,6 +10,8 @@
 'use strict';
 
 const crypto = require('crypto');
+// el mismo módulo que usa el formulario (js/telefono.js): cualquier código de país
+const Telefono = require('../js/telefono');
 
 async function precio() {
   const usd = Number(process.env.PRECIO_USD || 200);
@@ -48,8 +50,11 @@ function validar(b) {
   if (!opciones.includes(d.decisiones)) return { error: 'Falta cómo se toman las decisiones.', campo: 'decisiones' };
   if (d.nombre.length < 3) return { error: 'Falta tu nombre y apellido.', campo: 'nombre' };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email)) return { error: 'Revisá el email.', campo: 'email' };
-  const dig = d.whatsapp.replace(/\D/g, '');
-  if (dig.length < 8 || dig.length > 15) return { error: 'Revisá el WhatsApp.', campo: 'whatsapp' };
+  // sin país (formulario viejo en caché o sin JS) se toma Argentina; con + adelante, el número manda
+  const pais = limpiar(b.pais, 2).toUpperCase() || 'AR';
+  const tel = Telefono.normalizar(pais, d.whatsapp);
+  if (!tel.ok) return { error: tel.error, campo: 'whatsapp' };
+  d.whatsapp = tel.e164;
   return { datos: d };
 }
 

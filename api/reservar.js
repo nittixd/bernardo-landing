@@ -93,7 +93,7 @@ module.exports = async (req, res) => {
           '',
           'Nombre: ' + reserva.nombre,
           'Email: ' + reserva.email,
-          'WhatsApp: ' + reserva.whatsapp,
+          'WhatsApp: ' + reserva.whatsapp + (/^\+\d{8,15}$/.test(reserva.whatsapp) ? ' (https://wa.me/' + reserva.whatsapp.slice(1) + ')' : ''),
           '',
           'A qué se dedica: ' + (m.dedicacion || ''),
           'Sobre qué quiere conversar: ' + (m.tema || ''),

@@ -27,6 +27,45 @@
     if (r) r.checked = true;
   }
 
+  /* WhatsApp con código de país (js/telefono.js, el mismo módulo que valida en /api) */
+  var T = window.Telefono;
+  var selPais = form.elements.pais;
+  var inWa = form.elements.whatsapp;
+  var chipBandera = form.querySelector('[data-tel-bandera]');
+  var chipCodigo = form.querySelector('[data-tel-codigo]');
+  function pintarPais() {
+    if (!T || !selPais) return;
+    var p = T.buscar(selPais.value);
+    chipBandera.textContent = T.bandera(selPais.value);
+    chipCodigo.textContent = p ? '+' + p.codigo : '+';
+    inWa.placeholder = !p ? '+ código y número' : p.iso === 'AR' ? '221 555 1234' : 'Tu número';
+  }
+  if (T && selPais) {
+    selPais.innerHTML = '';
+    T.PAISES.forEach(function (p) {
+      selPais.add(new Option(T.bandera(p.iso) + ' ' + p.nombre + ' +' + p.codigo, p.iso));
+    });
+    selPais.add(new Option(T.bandera(T.OTRO) + ' Otro país', T.OTRO));
+    selPais.value = data.pais || T.paisPorZona();
+    if (!selPais.value) selPais.value = 'AR';
+    pintarPais();
+    selPais.addEventListener('change', function () { setErr('whatsapp', ''); pintarPais(); });
+    // si escribe el número completo con +, el selector se acomoda solo
+    inWa.addEventListener('input', function () {
+      var v = inWa.value.trim();
+      if (!/^(\+|00)\d/.test(v)) return;
+      var iso = T.paisDe(v);
+      if (iso !== selPais.value && !(iso === 'US' && selPais.value === 'DO')) { selPais.value = iso; pintarPais(); }
+    });
+  }
+  function telefono() {
+    if (!T) {
+      var dig = val('whatsapp').replace(/\D/g, '');
+      return dig.length >= 8 && dig.length <= 15 ? { ok: true, e164: '+' + dig } : { ok: false, error: 'Escribí tu número con código de área.' };
+    }
+    return T.normalizar(selPais ? selPais.value : 'AR', val('whatsapp'));
+  }
+
   function firstIncomplete() {
     if (!data.dedicacion) return 0;
     if (!data.tema) return 1;
@@ -102,13 +141,13 @@
       ok = !!val('decisiones');
       setErr('decisiones', ok ? '' : 'Elegí una opción.');
     } else if (i === 3) {
-      var n = val('nombre'), e = val('email'), w = val('whatsapp').replace(/[^\d]/g, '');
+      var n = val('nombre'), e = val('email'), tel = telefono();
       var okN = n.length >= 3 && /[a-záéíóúñü]/i.test(n);
       var okE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-      var okW = w.length >= 8 && w.length <= 15;
+      var okW = tel.ok;
       setErr('nombre', okN ? '' : 'Escribí tu nombre y apellido.');
       setErr('email', okE ? '' : 'Revisá el email.');
-      setErr('whatsapp', okW ? '' : 'Escribí tu número con código de área.');
+      setErr('whatsapp', okW ? '' : tel.error);
       ok = okN && okE && okW;
       if (!ok) {
         var bad = !okN ? 'nombre' : !okE ? 'email' : 'whatsapp';
@@ -119,7 +158,7 @@
   }
 
   function persist() {
-    ['dedicacion', 'tema', 'decisiones', 'nombre', 'email', 'whatsapp'].forEach(function (k) { data[k] = val(k); });
+    ['dedicacion', 'tema', 'decisiones', 'nombre', 'email', 'whatsapp', 'pais'].forEach(function (k) { data[k] = val(k); });
     save(data);
   }
 
@@ -186,7 +225,7 @@
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
         dedicacion: data.dedicacion, tema: data.tema, decisiones: data.decisiones,
-        nombre: data.nombre, email: data.email, whatsapp: data.whatsapp
+        nombre: data.nombre, email: data.email, whatsapp: data.whatsapp, pais: data.pais
       })
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; });

@@ -23,6 +23,21 @@
   var fCorta = { format: function (x) { return fDia.format(x) + ' ' + fNum.format(x); } };
   var limpiar = function (s) { return s.replace('.', ''); };
 
+  /* Visitas de otra zona horaria: los turnos son en hora de Argentina y al lado va la hora del visitante.
+     Devuelve '' si para esa persona es la misma hora (Uruguay, Brasil, Paraguay en verano, etc.). */
+  var fHoraLocal = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  var fFechaAR = fmt({ year: 'numeric', month: '2-digit', day: '2-digit' });
+  var fFechaLocal = new Intl.DateTimeFormat('es-AR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  var fDiaLocal = new Intl.DateTimeFormat('es-AR', { weekday: 'short' });
+  function tuHora(x) {
+    try {
+      var otroDia = fFechaLocal.format(x) !== fFechaAR.format(x);
+      var h = fHoraLocal.format(x);
+      if (h === fHora.format(x) && !otroDia) return '';
+      return h + (otroDia ? ' del ' + limpiar(fDiaLocal.format(x)) : '');
+    } catch (e) { return ''; }
+  }
+
   function waLink(intro) {
     var lineas = [
       intro,
@@ -88,9 +103,19 @@
 
   function confirmada(r) {
     title.textContent = 'Tu consulta quedó reservada';
-    var ini = new Date(r.inicio);
-    text.textContent = 'Te espero el ' + fLarga.format(ini) + ' a las ' + fHora.format(ini) + ' por Google Meet.' +
+    var ini = new Date(r.inicio), suya = tuHora(ini);
+    text.textContent = 'Te espero el ' + fLarga.format(ini) + ' a las ' + fHora.format(ini) +
+      (suya ? ', hora de Argentina (' + suya + ' en tu hora),' : '') + ' por Google Meet.' +
       (r.email ? ' Te llegó la invitación a ' + r.email + ' con el link de la videollamada.' : '');
+    // para cambiar el horario, por mail (sin innerHTML: el número de pago viene de la URL)
+    var mail = 'consultas@bernardovasquez.com.ar';
+    var a = document.createElement('a');
+    a.href = 'mailto:' + mail + '?subject=' + encodeURIComponent('Cambiar el horario de mi consulta');
+    a.textContent = mail;
+    small.textContent = 'Si necesitás cambiar el horario, escribí a ';
+    small.appendChild(a);
+    small.appendChild(document.createTextNode('.' + (pago ? ' Número de pago: ' + pago + '.' : '')));
+    small.hidden = false;
     agenda.hidden = true;
     if (r.meetUrl) {
       action.textContent = 'Abrir el link de Meet';
@@ -106,11 +131,13 @@
 
   /* Selector de día y horario con los turnos libres que devuelve /api/turnos. */
   function selector(dias) {
-    text.textContent = 'Ahora elegí el día y el horario que te quede mejor. La consulta es por Google Meet y dura una hora.';
+    var otraZona = dias.some(function (dia) { return dia.turnos.some(function (t) { return tuHora(new Date(t)); }); });
+    text.textContent = 'Ahora elegí el día y el horario que te quede mejor. La consulta es por Google Meet y dura una hora.' +
+      (otraZona ? ' Los horarios están en hora de Argentina y debajo de cada uno va la hora donde estás vos.' : '');
     action.hidden = true;
     var elegido = { dia: 0, turno: null };
 
-    agenda.className = 'slots';
+    agenda.className = 'slots' + (otraZona ? ' slots--zona' : '');
     agenda.innerHTML =
       '<div class="slots__days" role="tablist" aria-label="Día"></div>' +
       '<div class="slots__times" role="radiogroup" aria-label="Horario"></div>' +
@@ -144,7 +171,14 @@
         b.className = 'slots__time' + (iso === elegido.turno ? ' is-on' : '');
         b.setAttribute('role', 'radio');
         b.setAttribute('aria-checked', iso === elegido.turno ? 'true' : 'false');
+        var suya = otraZona ? tuHora(new Date(iso)) : '';
         b.textContent = fHora.format(new Date(iso));
+        if (suya) {
+          var s2 = document.createElement('small');
+          s2.textContent = suya + ' en tu hora';
+          b.appendChild(s2);
+          b.setAttribute('aria-label', fHora.format(new Date(iso)) + ' de Argentina, ' + suya + ' en tu hora');
+        }
         b.addEventListener('click', function () { elegido.turno = iso; pintarHoras(); actualizar(); });
         cHoras.appendChild(b);
       });
@@ -153,7 +187,8 @@
       if (!elegido.turno) { boton.disabled = true; boton.textContent = 'Elegí un horario'; return; }
       var f = new Date(elegido.turno);
       boton.disabled = false;
-      boton.textContent = 'Reservar el ' + fCorta.format(f) + ' a las ' + fHora.format(f);
+      var suya = otraZona ? tuHora(f) : '';
+      boton.textContent = 'Reservar el ' + fCorta.format(f) + ' a las ' + fHora.format(f) + (suya ? ' (' + suya + ' en tu hora)' : '');
     }
     boton.addEventListener('click', function () {
       if (!elegido.turno) return;

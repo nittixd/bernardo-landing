@@ -23,7 +23,7 @@
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
 <link rel="preload" href="/assets/fonts/fraunces-400-600.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/satoshi-500.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/styles.css?v=10">
+<link rel="stylesheet" href="/css/styles.css?v=11">
 <script>document.documentElement.classList.add('js')</script>
 <!--
 THESIS: la consulta paga como única puerta; el formulario de preguntas vive en el primer viewport (mecánica de la referencia Arcadia), sin el andamiaje de "clase en vivo".
@@ -99,7 +99,15 @@ FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya te
           <input class="field" type="email" name="email" id="f-email" autocomplete="email" inputmode="email" maxlength="120" required>
           <p class="step__err" data-err="email"></p>
           <label class="lbl" for="f-whatsapp">WhatsApp</label>
-          <input class="field" type="tel" name="whatsapp" id="f-whatsapp" autocomplete="tel" inputmode="tel" maxlength="30" placeholder="221 555 1234" required>
+          <div class="tel">
+            <span class="tel__pais">
+              <span class="tel__chip" aria-hidden="true"><span data-tel-bandera>🇦🇷</span><span data-tel-codigo>+54</span><svg viewBox="0 0 20 20"><path d="M6 8l4 4 4-4"/></svg></span>
+              <select class="tel__select" name="pais" id="f-pais" aria-label="País del número de WhatsApp">
+                <option value="AR" selected>🇦🇷 Argentina +54</option>
+              </select>
+            </span>
+            <input class="field tel__num" type="tel" name="whatsapp" id="f-whatsapp" autocomplete="tel-national" inputmode="tel" maxlength="30" placeholder="221 555 1234" required>
+          </div>
           <p class="step__err" data-err="whatsapp"></p>
           <p class="step__err step__err--form" data-err="form"></p>
           <button class="btn btn--primary" type="submit" data-submit>
@@ -178,6 +186,7 @@ FORM: híbrido pedido por José: la piel del brief sobre la estructura que ya te
 </footer>
 
 <script src="/js/config.js?v=4"></script>
-<script src="/js/main.js?v=6"></script>
+<script src="/js/telefono.js?v=1"></script>
+<script src="/js/main.js?v=7"></script>
 </body>
 </html>
