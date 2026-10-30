@@ -109,7 +109,7 @@
     if (pais.iso === 'AR') {
       if (d.indexOf('54') === 0 && d.length >= 12) return completo(d); // escribió el 54 sin el +
       var n = nacionalAR(d);
-      if (n.length < 10) return { ok: false, error: 'Sumá el código de área, por ejemplo 264 412 3456.' };
+      if (n.length < 10) return { ok: false, error: 'Falta el código de área, por ejemplo 11, 221 o 264.' };
       return listo('54' + n);
     }
 
